@@ -1,0 +1,5400 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon210.png">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BSK9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Кибербаскетбол PRO</title>
+    <style>
+        :root {
+            --primary: #4cc9f0;
+            --secondary: #f72585;
+            --background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            --container-bg: rgba(0, 0, 0, 0.95);
+        }
+
+        .theme-sun { --background: linear-gradient(135deg, #ff9d00, #ff2e00, #ff0099); --primary: #ff9d00; --secondary: #ff0099; }
+        .theme-moon { --background: linear-gradient(135deg, #667eea, #764ba2, #6B8DD6); --primary: #667eea; --secondary: #764ba2; }
+        .theme-fullmoon { --background: linear-gradient(135deg, #4facfe, #00f2fe, #00c6fb); --primary: #4facfe; --secondary: #00f2fe; }
+        .theme-newmoon { --background: linear-gradient(135deg, #2c3e50, #34495e, #1a252f); --primary: #3498db; --secondary: #2c3e50; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        html, body {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--background);
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: var(--container-bg);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .header {
+            padding: max(5px, env(safe-area-inset-top)) 8px 0;
+            flex-shrink: 0;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .basket-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            color: var(--primary);
+            cursor: pointer;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 2px;
+            margin-bottom: 4px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 5px 2px;
+            border: none;
+            border-radius: 4px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: black;
+            font-weight: bold;
+        }
+
+        .mode-switcher {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 2px;
+            margin-bottom: 4px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 5px 2px;
+            border: none;
+            border-radius: 4px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: black;
+            font-weight: bold;
+        }
+
+        .theme-switcher {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3px;
+        }
+
+        .theme-btn {
+            padding: 5px 1px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            min-height: 26px;
+        }
+
+        .theme-btn.active {
+            box-shadow: 0 0 3px var(--primary);
+            background: var(--primary);
+            color: black;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 0 8px 8px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .period {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border-radius: 6px;
+        }
+
+        h2 {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .teams-row {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .team-input {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.7rem;
+            color: #bdb2ff;
+            margin-bottom: 2px;
+            text-align: center;
+        }
+
+        .score-input {
+            width: 100%;
+            padding: 6px;
+            border: 2px solid var(--primary);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.95);
+            font-size: 0.9rem;
+            text-align: center;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .vs-text {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 0.75rem;
+            margin: 0 1px;
+        }
+
+        .result {
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 8px;
+            background: rgba(76, 201, 240, 0.2);
+            border-radius: 6px;
+            border: 2px solid var(--primary);
+            margin-top: 3px;
+        }
+
+        .additional-result {
+            text-align: center;
+            font-size: 0.85rem;
+            padding: 6px;
+            background: rgba(247, 37, 133, 0.2);
+            border-radius: 6px;
+            border: 2px solid var(--secondary);
+            margin-top: 3px;
+        }
+
+        .visualization-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 1;
+            gap: 10px;
+            padding: 5px 0;
+        }
+
+        .triangle-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+        }
+
+        .triangle-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .trend-up {
+            color: #4ade80;
+            border: 2px solid #4ade80;
+        }
+
+        .trend-down {
+            color: #f87171;
+            border: 2px solid #f87171;
+        }
+
+        .trend-stable {
+            color: #fbbf24;
+            border: 2px solid #fbbf24;
+        }
+
+        .prediction-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .prediction-panel h3 {
+            color: var(--primary);
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 2px;
+        }
+
+        .prediction-method {
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            border-left: 2px solid var(--secondary);
+        }
+
+        .prediction-method h4 {
+            font-size: 0.75rem;
+            color: var(--secondary);
+            margin-bottom: 4px;
+        }
+
+        .prediction-method .result {
+            font-size: 0.75rem;
+            padding: 3px;
+            background: transparent;
+            border: none;
+            margin-top: 1px;
+            text-align: left;
+        }
+
+        .confidence-meter {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Обновленные стили для магического квадрата */
+        .magic-square-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        .magic-square {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 6px;
+            width: 220px;
+            height: 220px;
+            margin: 12px auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 8px;
+            border: 2px solid var(--primary);
+        }
+
+        .magic-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .magic-cell.active {
+            background: var(--primary);
+            color: black;
+            transform: scale(1.05);
+            box-shadow: 0 0 12px var(--primary);
+        }
+
+        .magic-cell.diagonal {
+            border-color: var(--secondary);
+        }
+
+        .magic-cell.diagonal.active {
+            background: var(--secondary);
+            box-shadow: 0 0 12px var(--secondary);
+        }
+
+        .magic-cell.corner {
+            border-style: double;
+        }
+
+        .magic-cell.center {
+            border-width: 3px;
+        }
+
+        .cell-index {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .magic-calculations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .calculation-group {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .calculation-group.diagonal {
+            border-left-color: var(--secondary);
+        }
+
+        .calculation-title {
+            font-size: 0.8rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .calculation-title.diagonal {
+            color: var(--secondary);
+        }
+
+        .calculation-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            padding: 2px 0;
+        }
+
+        .calculation-value {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .calculation-value.diagonal {
+            color: var(--secondary);
+        }
+
+        .calculation-formula {
+            font-size: 0.7rem;
+            color: #bdb2ff;
+            text-align: center;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .magic-summary {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .summary-title {
+            color: var(--primary);
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-label {
+            font-size: 0.75rem;
+            color: #bdb2ff;
+        }
+
+        .summary-value {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .energy-level {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .energy-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .energy-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .energy-low { background: #ef4444; width: 33%; }
+        .energy-medium { background: #f59e0b; width: 66%; }
+        .energy-high { background: #10b981; width: 100%; }
+
+        .magic-result {
+            text-align: center;
+            font-size: 1.1rem;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.2), rgba(247, 37, 133, 0.2));
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+            margin-top: 12px;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .prediction-breakdown {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .breakdown-item {
+            text-align: center;
+            padding: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .breakdown-value {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+
+        .interpretation {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .interpretation-title {
+            color: var(--secondary);
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .interpretation-text {
+            font-size: 0.75rem;
+            line-height: 1.3;
+            text-align: center;
+            color: #bdb2ff;
+        }
+
+        .magic-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 12px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.7rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .legend-primary {
+            background: var(--primary);
+        }
+
+        .legend-secondary {
+            background: var(--secondary);
+        }
+
+        .legend-corner {
+            background: transparent;
+            border: 2px double var(--primary);
+        }
+
+        /* Стили для вкладки Сидика Авгана */
+        .sidik-container {
+            padding: 10px;
+            gap: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidik-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidik-card-title {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidik-input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .sidik-input-field {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .sidik-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #bdb2ff;
+        }
+
+        .sidik-input, .sidik-select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+        }
+
+        .sidik-input:focus, .sidik-select:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .sidik-button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(76, 201, 240, 0.4);
+            width: 100%;
+        }
+
+        .sidik-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 201, 240, 0.6);
+        }
+
+        .sidik-datetime-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .sidik-datetime-control {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .sidik-use-current-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .sidik-use-current-time input {
+            width: auto;
+        }
+
+        .sidik-results {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .sidik-results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .sidik-result-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .sidik-result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 8px 0;
+            color: var(--primary);
+        }
+
+        .sidik-result-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .sidik-magic-square {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin: 12px auto;
+            max-width: 280px;
+        }
+
+        .sidik-square-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .sidik-square-cell.highlight {
+            background: rgba(247, 37, 133, 0.3);
+            border-color: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .sidik-recommendations {
+            margin-top: 15px;
+        }
+
+        .sidik-recommendation-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .sidik-recommendation-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border-radius: 6px;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .sidik-recommendation-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .sidik-analysis-text {
+            margin-top: 10px;
+            line-height: 1.5;
+            opacity: 0.9;
+            font-size: 0.8rem;
+        }
+
+        .sidik-loader {
+            display: none;
+            text-align: center;
+            margin: 12px 0;
+        }
+
+        .sidik-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        .sidik-datetime-factor {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .sidik-custom-keyboard {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .sidik-keyboard-key {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidik-keyboard-key:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .sidik-keyboard-key.clear {
+            background: rgba(247, 37, 133, 0.7);
+        }
+
+        .sidik-keyboard-key.done {
+            background: rgba(76, 201, 240, 0.7);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .keyboard {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.98);
+            padding: 6px;
+            display: none;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3px;
+            z-index: 1000;
+            border-radius: 10px 10px 0 0;
+            max-height: 28vh;
+            border-top: 1px solid var(--primary);
+        }
+
+        .keyboard.active {
+            display: grid;
+        }
+
+        .key {
+            padding: 8px 4px;
+            background: var(--primary);
+            border: none;
+            border-radius: 4px;
+            color: black;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .key.clear {
+            background: #e74c3c;
+        }
+
+        .key.submit {
+            background: #27ae60;
+        }
+
+        .close-keyboard {
+            position: absolute;
+            top: -28px;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            border: 1px solid var(--primary);
+        }
+
+        .period-third {
+            display: none;
+        }
+
+        .risk-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .risk-low {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+        }
+
+        .risk-medium {
+            background: rgba(234, 179, 8, 0.2);
+            border: 1px solid #eab308;
+        }
+
+        .risk-high {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+        }
+
+        /* Стили для вкладки Самообучения */
+        .learning-container {
+            padding: 10px;
+            gap: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .learning-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .learning-card-title {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .current-predictions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .current-predictions h4 {
+            color: var(--primary);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .predictions-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .prediction-item {
+            text-align: center;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .prediction-method {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .prediction-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .combined-prediction {
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.2), rgba(247, 37, 133, 0.2));
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            margin-top: 8px;
+        }
+
+        .combined-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 4px 0;
+        }
+
+        .actual-result-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .actual-result-input label {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .match-history {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.75rem;
+        }
+
+        .history-prediction {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .history-actual {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .history-error {
+            color: #f87171;
+            font-size: 0.7rem;
+        }
+
+        .history-success {
+            color: #4ade80;
+            font-size: 0.7rem;
+        }
+
+        /* ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ МЕТРИК ПРОИЗВОДИТЕЛЬНОСТИ */
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 5px 0;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .metric-trend {
+            font-size: 0.7rem;
+            margin-top: 4px;
+        }
+
+        .trend-up { color: #4ade80; }
+        .trend-down { color: #f87171; }
+        .trend-stable { color: #fbbf24; }
+
+        .accuracy-chart {
+            height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 10px;
+            display: flex;
+            align-items: end;
+            gap: 4px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--primary);
+            border-radius: 2px 2px 0 0;
+            position: relative;
+            min-height: 4px;
+            transition: height 0.5s ease;
+        }
+
+        .chart-bar.current {
+            background: var(--secondary);
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            font-size: 0.6rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .model-parameters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .parameter-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .parameter-name {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .parameter-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .parameter-change {
+            font-size: 0.65rem;
+            margin-top: 2px;
+        }
+
+        .adaptive-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .adaptive-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .adaptive-btn.primary {
+            background: var(--primary);
+            color: black;
+            font-weight: bold;
+        }
+
+        .adaptive-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .correction-factor {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        .factor-label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            min-width: 120px;
+        }
+
+        .factor-value {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .factor-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .intelligence-indicator {
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.2), rgba(247, 37, 133, 0.2));
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+            margin-top: 10px;
+        }
+
+        .intelligence-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 5px 0;
+        }
+
+        .intelligence-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .learning-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 0.75rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--secondary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .confidence-levels {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .confidence-item {
+            text-align: center;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        .confidence-name {
+            font-size: 0.65rem;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+
+        .confidence-value {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .prediction-comparison {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px;
+            align-items: center;
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .comparison-old, .comparison-new {
+            text-align: center;
+        }
+
+        .comparison-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .comparison-old .comparison-value {
+            color: #f87171;
+        }
+
+        .comparison-new .comparison-value {
+            color: #4ade80;
+        }
+
+        .comparison-arrow {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .adaptive-algorithm {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            border-left: 3px solid var(--secondary);
+        }
+
+        .algorithm-title {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .algorithm-desc {
+            font-size: 0.7rem;
+            opacity: 0.9;
+            line-height: 1.3;
+        }
+
+        /* Новые стили для индикаторов отклонений */
+        .deviation-indicators {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .deviation-indicator {
+            text-align: center;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .deviation-indicator.active {
+            border-color: var(--primary);
+            background: rgba(76, 201, 240, 0.1);
+        }
+
+        .deviation-icon {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .deviation-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+
+        .deviation-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .deviation-description {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        /* Дополнительные стили для системы самообучения */
+        .data-source-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            font-size: 0.7rem;
+        }
+
+        .source-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .source-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .source-calc-color { background: var(--secondary); }
+        .source-magic-color { background: var(--primary); }
+        .source-sidik-color { background: #ffc107; }
+
+        /* НОВЫЕ СТИЛИ ДЛЯ АНАЛИЗА ТРЕНДА */
+        .trend-analysis {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trend-analysis::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+        }
+
+        .trend-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .trend-title {
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .trend-confidence {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            color: #bdb2ff;
+        }
+
+        .trend-direction-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin: 12px 0;
+        }
+
+        .trend-arrow {
+            font-size: 2.5rem;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+        }
+
+        .trend-arrow.up {
+            color: #4ade80;
+            transform: scale(1.1);
+        }
+
+        .trend-arrow.down {
+            color: #f87171;
+            transform: scale(1.1);
+        }
+
+        .trend-arrow.neutral {
+            color: #fbbf24;
+        }
+
+        .trend-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .trend-metric {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .trend-metric-label {
+            font-size: 0.65rem;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+
+        .trend-metric-value {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .trend-recommendation {
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.15), rgba(247, 37, 133, 0.15));
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .recommendation-text {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .recommendation-details {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            color: #bdb2ff;
+        }
+
+        .trend-sources {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .trend-source {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            opacity: 0.7;
+        }
+
+        .source-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .source-calc { background: var(--secondary); }
+        .source-magic { background: var(--primary); }
+        .source-analytics { background: #ffc107; }
+
+        /* Анимации для тренда */
+        @keyframes pulse-grow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes pulse-glow {
+            0% { filter: drop-shadow(0 0 5px currentColor); }
+            50% { filter: drop-shadow(0 0 15px currentColor); }
+            100% { filter: drop-shadow(0 0 5px currentColor); }
+        }
+
+        .trend-arrow.strong {
+            animation: pulse-grow 2s infinite, pulse-glow 2s infinite;
+        }
+
+        /* НОВЫЕ СТИЛИ ДЛЯ ВКЛАДКИ ЛИГ */
+        .leagues-container {
+            padding: 10px;
+            gap: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .league-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .league-select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 0.85rem;
+            -webkit-appearance: none;
+        }
+
+        .league-manage-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .league-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .league-history {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .history-match {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.75rem;
+        }
+
+        .match-teams {
+            flex: 1;
+        }
+
+        .match-score {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .match-total {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .league-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .league-modal-content {
+            background: var(--container-bg);
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid var(--primary);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            color: var(--primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .league-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+            color: #bdb2ff;
+        }
+
+        .form-input {
+            padding: 8px 12px;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .time-factors-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .time-factor-input {
+            padding: 6px 8px;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: black;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .leagues-list {
+            margin-top: 15px;
+        }
+
+        .league-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .league-info {
+            flex: 1;
+        }
+
+        .league-name {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .league-details {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .league-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            padding: 5px 8px;
+            border: none;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        /* Специальные стили для очень маленьких экранов */
+        @media (max-height: 700px) {
+            .header {
+                padding: max(3px, env(safe-area-inset-top)) 6px 0;
+            }
+            
+            .content {
+                gap: 4px;
+                padding: 0 6px 6px;
+            }
+            
+            .period {
+                padding: 4px;
+            }
+            
+            .triangle-container {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .prediction-panel {
+                padding: 8px;
+                gap: 6px;
+                margin-top: 6px;
+            }
+            
+            .prediction-method {
+                padding: 4px;
+            }
+            
+            .trend-indicator {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .magic-square {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .magic-cell {
+                font-size: 1.1rem;
+            }
+            
+            .magic-calculations {
+                gap: 8px;
+            }
+            
+            .calculation-group {
+                padding: 8px;
+            }
+            
+            .sidik-container {
+                padding: 8px;
+                gap: 10px;
+            }
+            
+            .sidik-card {
+                padding: 12px;
+            }
+            
+            .sidik-card-title {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+            
+            .sidik-input-group {
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+            
+            .sidik-input-field {
+                min-width: 100px;
+            }
+            
+            .sidik-magic-square {
+                max-width: 240px;
+            }
+            
+            .sidik-square-cell {
+                font-size: 1rem;
+            }
+            
+            .learning-container {
+                padding: 8px;
+                gap: 10px;
+            }
+            
+            .learning-card {
+                padding: 12px;
+            }
+            
+            .performance-metrics {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .model-parameters {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .confidence-levels {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .leagues-container {
+                padding: 8px;
+                gap: 10px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .triangle-container {
+                width: 130px;
+                height: 130px;
+            }
+            
+            .prediction-panel h3 {
+                font-size: 0.8rem;
+            }
+            
+            .prediction-method h4 {
+                font-size: 0.7rem;
+            }
+            
+            .prediction-method .result {
+                font-size: 0.7rem;
+            }
+            
+            .magic-square {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .magic-cell {
+                font-size: 1rem;
+            }
+            
+            .magic-summary {
+                padding: 8px;
+            }
+            
+            .magic-result {
+                padding: 8px;
+                font-size: 1rem;
+            }
+            
+            .sidik-container {
+                padding: 6px;
+                gap: 8px;
+            }
+            
+            .sidik-card {
+                padding: 10px;
+            }
+            
+            .sidik-card-title {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
+            
+            .sidik-input-group {
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+            
+            .sidik-input-field {
+                min-width: 90px;
+            }
+            
+            .sidik-magic-square {
+                max-width: 220px;
+            }
+            
+            .sidik-square-cell {
+                font-size: 0.9rem;
+            }
+            
+            .learning-container {
+                padding: 6px;
+                gap: 8px;
+            }
+            
+            .learning-card {
+                padding: 10px;
+            }
+            
+            .learning-card-title {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
+            
+            .performance-metrics {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .metric-card {
+                padding: 8px;
+            }
+            
+            .metric-value {
+                font-size: 1.2rem;
+            }
+            
+            .leagues-container {
+                padding: 6px;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .magic-calculations {
+                grid-template-columns: 1fr;
+            }
+            
+            .prediction-breakdown {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidik-results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidik-datetime-controls {
+                flex-direction: column;
+            }
+            
+            .sidik-datetime-control {
+                min-width: 100%;
+            }
+            
+            .performance-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .model-parameters {
+                grid-template-columns: 1fr;
+            }
+            
+            .confidence-levels {
+                grid-template-columns: 1fr;
+            }
+            
+            .adaptive-controls {
+                flex-direction: column;
+            }
+            
+            .predictions-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .deviation-indicators {
+                grid-template-columns: 1fr;
+            }
+            
+            .league-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-factors-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="theme-sun">
+<div class="container">
+    <div class="header">
+        <div class="title-row">
+            <h1>🏀 Кибербаскетбол PRO</h1>
+            <button class="basket-btn" onclick="clearAllData()" title="Очистить все данные">🏀</button>
+        </div>
+        <div class="tabs">
+            <button class="tab active" onclick="setTab('calculator')">Калькулятор</button>
+            <button class="tab" onclick="setTab('visualization')">Аналитика</button>
+            <button class="tab" onclick="setTab('magic')">Магический квадрат</button>
+            <button class="tab" onclick="setTab('sidik')">Сидик Авган</button>
+            <button class="tab" onclick="setTab('learning')">Самообучение</button>
+            <button class="tab" onclick="setTab('leagues')">Лиги</button>
+        </div>
+        <div class="mode-switcher">
+            <button class="mode-btn active" onclick="setMode('two')">2 периода</button>
+            <button class="mode-btn" onclick="setMode('three')">3 периода</button>
+        </div>
+        <div class="theme-switcher">
+            <button class="theme-btn active" onclick="setTheme('sun')">☀️</button>
+            <button class="theme-btn" onclick="setTheme('moon')">🌙</button>
+            <button class="theme-btn" onclick="setTheme('fullmoon')">🌕</button>
+            <button class="theme-btn" onclick="setTheme('newmoon')">🌑</button>
+        </div>
+    </div>
+    <div class="content">
+        <div class="tab-content active" id="calculator-tab">
+            <div class="period">
+                <h2>Первый период</h2>
+                <div class="teams-row">
+                    <div class="team-input">
+                        <label>Команда 1</label>
+                        <input type="text" class="score-input" id="team1-period1" value="0" readonly onclick="showKeyboard(this)">
+                    </div>
+                    <div class="vs-text">VS</div>
+                    <div class="team-input">
+                        <label>Команда 2</label>
+                        <input type="text" class="score-input" id="team2-period1" value="0" readonly onclick="showKeyboard(this)">
+                    </div>
+                </div>
+            </div>
+            <div class="period">
+                <h2>Второй период</h2>
+                <div class="teams-row">
+                    <div class="team-input">
+                        <label>Команда 1</label>
+                        <input type="text" class="score-input" id="team1-period2" value="0" readonly onclick="showKeyboard(this)">
+                    </div>
+                    <div class="vs-text">VS</div>
+                    <div class="team-input">
+                        <label>Команда 2</label>
+                        <input type="text" class="score-input" id="team2-period2" value="0" readonly onclick="showKeyboard(this)">
+                    </div>
+                </div>
+            </div>
+            <div class="period period-third" id="third-period">
+                <h2>Третий период</h2>
+                <div class="teams-row">
+                    <div class="team-input">
+                        <label>Команда 1</label>
+                        <input type="text" class="score-input" id="team1-period3" value="0" readonly onclick="showKeyboard(this)">
+                    </div>
+                    <div class="vs-text">VS</div>
+                    <div class="team-input">
+                        <label>Команда 2</label>
+                        <input type="text" class="score-input" id="team2-period3" value="0" readonly onclick="showKeyboard(this)">
+                    </div>
+                </div>
+            </div>
+            <div id="result" class="result" style="display:none">
+                Тотал: <strong><span id="totalValue">0</span></strong>
+            </div>
+            <div id="additionalResult" class="additional-result" style="display:none">
+                Доп. расчет: <strong><span id="additionalValue">0</span></strong>
+            </div>
+        </div>
+        <div class="tab-content" id="visualization-tab">
+            <div class="visualization-container">
+                <h2>Анализ тренда тотала</h2>
+                <div class="triangle-container">
+                    <svg class="triangle-svg" viewBox="0 0 300 300"></svg>
+                </div>
+                <div id="trendIndicator" class="trend-indicator">
+                    <span id="trendIcon">↔️</span>
+                    <span id="trendText">Тренд не определен</span>
+                </div>
+                
+                <div class="prediction-panel">
+                    <h3>Прогноз для ставок</h3>
+                    
+                    <div class="prediction-method">
+                        <h4>Метод 1: Экспоненциальное сглаживание</h4>
+                        <div class="result">Прогноз: <span id="expSmoothPrediction">-</span></div>
+                        <div class="result">Точность: <span id="expSmoothAccuracy">-</span></div>
+                        <div class="confidence-meter">
+                            <div id="expSmoothConfidence" class="confidence-fill" style="width:0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="prediction-method">
+                        <h4>Метод 2: Взвешенная регрессия</h4>
+                        <div class="result">Прогноз: <span id="weightedRegPrediction">-</span></div>
+                        <div class="result">Дов. интервал: <span id="weightedRegInterval">-</span></div>
+                        <div class="confidence-meter">
+                            <div id="weightedRegConfidence" class="confidence-fill" style="width:0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="prediction-method">
+                        <h4>Метод 3: Адаптивный алгоритм</h4>
+                        <div class="result">Прогноз: <span id="adaptivePrediction">-</span></div>
+                        <div class="result">Сигнал: <span id="adaptiveSignal">-</span></div>
+                        <div class="confidence-meter">
+                            <div id="adaptiveConfidence" class="confidence-fill" style="width:0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="riskIndicator" class="risk-indicator risk-medium">
+                        <span id="riskIcon">⚠️</span>
+                        <span id="riskText">Умеренный риск</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="magic-tab">
+            <div class="magic-square-container">
+                <h2>🔮 Магический квадрат Сидика Авгана</h2>
+                
+                <div class="magic-explanation">
+                    Трансформация баскетбольных периодов в нумерологическую матрицу для точного прогнозирования
+                </div>
+                
+                <div class="magic-square" id="magicSquare">
+                    <!-- Ячейки заполняются JavaScript -->
+                </div>
+                
+                <div class="magic-calculations">
+                    <div class="calculation-group">
+                        <div class="calculation-title">📊 Основные суммы</div>
+                        <div class="calculation-item">
+                            <span>Магическая сумма:</span>
+                            <span class="calculation-value" id="magicSumTotal">0</span>
+                        </div>
+                        <div class="calculation-item">
+                            <span>Строка 1:</span>
+                            <span class="calculation-value" id="row1Sum">0</span>
+                        </div>
+                        <div class="calculation-item">
+                            <span>Строка 2:</span>
+                            <span class="calculation-value" id="row2Sum">0</span>
+                        </div>
+                        <div class="calculation-item">
+                            <span>Строка 3:</span>
+                            <span class="calculation-value" id="row3Sum">0</span>
+                        </div>
+                        <div class="calculation-formula">Суммы по строкам</div>
+                    </div>
+                    
+                    <div class="calculation-group diagonal">
+                        <div class="calculation-title diagonal">🎯 Диагонали силы</div>
+                        <div class="calculation-item">
+                            <span>Главная (↘):</span>
+                            <span class="calculation-value diagonal" id="mainDiagonalSum">0</span>
+                        </div>
+                        <div class="calculation-item">
+                            <span>Побочная (↙):</span>
+                            <span class="calculation-value diagonal" id="antiDiagonalSum">0</span>
+                        </div>
+                        <div class="calculation-item">
+                            <span>Баланс:</span>
+                            <span class="calculation-value diagonal" id="diagonalBalance">0</span>
+                        </div>
+                        <div class="calculation-item">
+                            <span>Энергия:</span>
+                            <span class="calculation-value diagonal" id="diagonalEnergy">0</span>
+                        </div>
+                        <div class="calculation-formula">(Гл. + Поб.) / 2</div>
+                    </div>
+                </div>
+
+                <div class="magic-summary">
+                    <div class="summary-title">📈 Анализ энергии</div>
+                    <div class="summary-item">
+                        <span class="summary-label">Активные ячейки:</span>
+                        <span class="summary-value" id="activeCells">0/9</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Сила центра:</span>
+                        <span class="summary-value" id="centerPower">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Энергетический уровень:</span>
+                        <span class="summary-value" id="energyLevel">Низкий</span>
+                    </div>
+                    <div class="energy-level">
+                        <span style="font-size: 0.7rem;">Энергия:</span>
+                        <div class="energy-bar">
+                            <div class="energy-fill" id="energyFill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="interpretation">
+                    <div class="interpretation-title">💡 Интерпретация матрицы</div>
+                    <div class="interpretation-text" id="magicInterpretation">
+                        Введите данные периодов для получения анализа...
+                    </div>
+                </div>
+
+                <div class="magic-result" id="magicResult" style="display:none">
+                    <div>✨ Магический прогноз: <strong><span id="magicPrediction">0</span></strong></div>
+                    <div class="prediction-breakdown">
+                        <div class="breakdown-item">
+                            <div>База</div>
+                            <div class="breakdown-value" id="basePrediction">0</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div>Коррекция</div>
+                            <div class="breakdown-value" id="correctionValue">0</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div>Энергия</div>
+                            <div class="breakdown-value" id="energyValue">0%</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div>Тренд</div>
+                            <div class="breakdown-value" id="trendValue">1.0x</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="magic-legend">
+                    <div class="legend-item">
+                        <div class="legend-color legend-primary"></div>
+                        <span>Активные ячейки</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-secondary"></div>
+                        <span>Диагональ силы</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-corner"></div>
+                        <span>Угловые ячейки</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="sidik-tab">
+            <div class="sidik-container">
+                <div class="sidik-card">
+                    <h2 class="sidik-card-title">
+                        <i>📊</i> Введите данные для прогноза
+                    </h2>
+                    
+                    <div class="sidik-use-current-time">
+                        <input type="checkbox" id="sidik-useCurrentTime" checked>
+                        <label for="sidik-useCurrentTime">Использовать текущие дату и время</label>
+                    </div>
+                    
+                    <div class="sidik-datetime-controls" id="sidik-datetimeControls" style="display: none;">
+                        <div class="sidik-datetime-control">
+                            <label for="sidik-customDate">Дата</label>
+                            <input type="date" id="sidik-customDate" class="sidik-input">
+                        </div>
+                        <div class="sidik-datetime-control">
+                            <label for="sidik-customTime">Время</label>
+                            <input type="time" id="sidik-customTime" class="sidik-input">
+                        </div>
+                        <div class="sidik-datetime-control">
+                            <label for="sidik-timezone">Часовой пояс</label>
+                            <select id="sidik-timezone" class="sidik-select">
+                                <option value="0">UTC</option>
+                                <option value="3" selected>Москва (+3)</option>
+                                <option value="1">Калининград (+1)</option>
+                                <option value="4">Самара (+4)</option>
+                                <option value="5">Екатеринбург (+5)</option>
+                                <option value="7">Красноярск (+7)</option>
+                                <option value="8">Иркутск (+8)</option>
+                                <option value="9">Якутск (+9)</option>
+                                <option value="10">Владивосток (+10)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="sidik-input-group">
+                        <div class="sidik-input-field">
+                            <label for="sidik-period1">Период 1</label>
+                            <input type="number" id="sidik-period1" class="sidik-input" placeholder="Введите значение" min="1" onclick="showSidikKeyboard(this)">
+                        </div>
+                        <div class="sidik-input-field">
+                            <label for="sidik-period2">Период 2</label>
+                            <input type="number" id="sidik-period2" class="sidik-input" placeholder="Введите значение" min="1" onclick="showSidikKeyboard(this)">
+                        </div>
+                        <div class="sidik-input-field">
+                            <label for="sidik-period3">Период 3</label>
+                            <input type="number" id="sidik-period3" class="sidik-input" placeholder="Введите значение" min="1" onclick="showSidikKeyboard(this)">
+                        </div>
+                    </div>
+                    
+                    <div class="sidik-custom-keyboard" id="sidik-customKeyboard">
+                        <button class="sidik-keyboard-key" data-value="1">1</button>
+                        <button class="sidik-keyboard-key" data-value="2">2</button>
+                        <button class="sidik-keyboard-key" data-value="3">3</button>
+                        <button class="sidik-keyboard-key" data-value="4">4</button>
+                        <button class="sidik-keyboard-key" data-value="5">5</button>
+                        <button class="sidik-keyboard-key" data-value="6">6</button>
+                        <button class="sidik-keyboard-key" data-value="7">7</button>
+                        <button class="sidik-keyboard-key" data-value="8">8</button>
+                        <button class="sidik-keyboard-key" data-value="9">9</button>
+                        <button class="sidik-keyboard-key clear">Очистить</button>
+                        <button class="sidik-keyboard-key" data-value="0">0</button>
+                        <button class="sidik-keyboard-key done">Готово</button>
+                    </div>
+                    
+                    <button id="sidik-calculateBtn" class="sidik-button">
+                        <i>🔮</i> Рассчитать прогноз
+                    </button>
+                </div>
+                
+                <div class="sidik-loader" id="sidik-loader">
+                    <div class="sidik-spinner"></div>
+                    <p>Выполняются магические расчеты...</p>
+                </div>
+                
+                <div class="sidik-results" id="sidik-results">
+                    <div class="sidik-card">
+                        <h2 class="sidik-card-title">
+                            <i>✨</i> Результаты прогноза
+                        </h2>
+                        <div class="sidik-results-grid">
+                            <div class="sidik-result-card">
+                                <div class="sidik-result-label">Четвертый период</div>
+                                <div class="sidik-result-value" id="sidik-period4Result">-</div>
+                                <div class="sidik-result-label">Нумерологический корень: <span id="sidik-period4Root">-</span></div>
+                            </div>
+                            <div class="sidik-result-card">
+                                <div class="sidik-result-label">Общий тотал</div>
+                                <div class="sidik-result-value" id="sidik-totalResult">-</div>
+                                <div class="sidik-result-label">Нумерологический корень: <span id="sidik-totalRoot">-</span></div>
+                            </div>
+                            <div class="sidik-result-card">
+                                <div class="sidik-result-label">Фактор даты/времени</div>
+                                <div class="sidik-result-value" id="sidik-datetimeFactor">-</div>
+                                <div class="sidik-result-label">Использовано: <span id="sidik-datetimeUsed">-</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="sidik-datetime-factor">
+                            <h3>Влияние даты и времени на прогноз:</h3>
+                            <p id="sidik-datetimeAnalysis">-</p>
+                        </div>
+                    </div>
+                    
+                    <div class="sidik-card">
+                        <h2 class="sidik-card-title">
+                            <i>🧊</i> Магический квадрат Сидика Авгана
+                        </h2>
+                        <div class="sidik-magic-square" id="sidik-magicSquare">
+                            <!-- Квадрат будет сгенерирован JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="sidik-card sidik-recommendations">
+                        <h2 class="sidik-card-title">
+                            <i>🎯</i> Рекомендации для ставок
+                        </h2>
+                        <div>
+                            <h3>Четвертый период (корень: <span id="sidik-recPeriodRoot">-</span>)</h3>
+                            <div class="sidik-recommendation-list" id="sidik-periodRecommendations">
+                                <!-- Рекомендации будут сгенерированы JavaScript -->
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <h3>Общий тотал (корень: <span id="sidik-recTotalRoot">-</span>)</h3>
+                            <div class="sidik-recommendation-list" id="sidik-totalRecommendations">
+                                <!-- Рекомендации будут сгенерированы JavaScript -->
+                            </div>
+                        </div>
+                        <div class="sidik-analysis-text" id="sidik-analysisText">
+                            <!-- Анализ будет сгенерирован JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="learning-tab">
+            <div class="learning-container">
+                <div class="learning-card">
+                    <h2 class="learning-card-title">
+                        <i>🧠</i> Реальная система самообучения
+                    </h2>
+                    
+                    <div class="current-predictions">
+                        <h4>Текущие прогнозы:</h4>
+                        
+                        <div class="data-source-info">
+                            <div class="source-indicator">
+                                <div class="source-color source-calc-color"></div>
+                                <span>Калькулятор: Доп. расчет (3п) / Основной (2п)</span>
+                            </div>
+                            <div class="source-indicator">
+                                <div class="source-color source-magic-color"></div>
+                                <span>Магический: Базовый прогноз</span>
+                            </div>
+                            <div class="source-indicator">
+                                <div class="source-color source-sidik-color"></div>
+                                <span>Сидик: Общий тотал</span>
+                            </div>
+                        </div>
+                        
+                        <div class="predictions-list" id="currentPredictionsList">
+                            <div class="prediction-item">
+                                <div class="prediction-method">Калькулятор</div>
+                                <div class="prediction-value" id="currentCalcPred">-</div>
+                            </div>
+                            <div class="prediction-item">
+                                <div class="prediction-method">Магический</div>
+                                <div class="prediction-value" id="currentMagicPred">-</div>
+                            </div>
+                            <div class="prediction-item">
+                                <div class="prediction-method">Сидик</div>
+                                <div class="prediction-value" id="currentSidikPred">-</div>
+                            </div>
+                        </div>
+                        
+                        <div class="combined-prediction">
+                            <div>Комбинированный прогноз:</div>
+                            <div class="combined-value" id="combinedPrediction">-</div>
+                            <div style="font-size: 0.7rem;">На основе весов обучения</div>
+                        </div>
+
+                        <!-- НОВЫЙ БЛОК АНАЛИЗА ТРЕНДА -->
+                        <div class="trend-analysis" id="trendAnalysis" style="display: none;">
+                            <div class="trend-header">
+                                <div class="trend-title">
+                                    <i>📈</i> Анализ направления тренда
+                                </div>
+                                <div class="trend-confidence" id="trendConfidence">-</div>
+                            </div>
+                            
+                            <div class="trend-direction-container">
+                                <div class="trend-arrow neutral" id="trendArrow">➡️</div>
+                            </div>
+                            
+                            <div class="trend-recommendation">
+                                <div class="recommendation-text" id="trendRecommendation">Анализируем данные...</div>
+                                <div class="recommendation-details" id="trendDetails">Собираем информацию со всех методов</div>
+                            </div>
+                            
+                            <div class="trend-metrics">
+                                <div class="trend-metric">
+                                    <div class="trend-metric-label">Сила тренда</div>
+                                    <div class="trend-metric-value" id="trendStrength">-</div>
+                                </div>
+                                <div class="trend-metric">
+                                    <div class="trend-metric-label">Согласованность</div>
+                                    <div class="trend-metric-value" id="trendAgreement">-</div>
+                                </div>
+                                <div class="trend-metric">
+                                    <div class="trend-metric-label">Волатильность</div>
+                                    <div class="trend-metric-value" id="trendVolatility">-</div>
+                                </div>
+                                <div class="trend-metric">
+                                    <div class="trend-metric-label">Импульс</div>
+                                    <div class="trend-metric-value" id="trendMomentum">-</div>
+                                </div>
+                            </div>
+                            
+                            <div class="trend-sources">
+                                <div class="trend-source">
+                                    <div class="source-dot source-calc"></div>
+                                    <span>Калькулятор</span>
+                                </div>
+                                <div class="trend-source">
+                                    <div class="source-dot source-magic"></div>
+                                    <span>Магический</span>
+                                </div>
+                                <div class="trend-source">
+                                    <div class="source-dot source-analytics"></div>
+                                    <span>Аналитика</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Существующие индикаторы отклонений -->
+                        <div class="deviation-indicators">
+                            <div class="deviation-indicator" id="fastDeviationIndicator">
+                                <div class="deviation-icon">⚡</div>
+                                <div class="deviation-label">Быстрая</div>
+                                <div class="deviation-value" id="fastDeviationValue">-</div>
+                                <div class="deviation-description">От предыдущего матча</div>
+                            </div>
+                            <div class="deviation-indicator" id="slowDeviationIndicator">
+                                <div class="deviation-icon">🐢</div>
+                                <div class="deviation-label">Медленная</div>
+                                <div class="deviation-value" id="slowDeviationValue">-</div>
+                                <div class="deviation-description">Среднее по всем матчам</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="actual-result-input">
+                        <label for="actualTotal">Реальный тотал матча:</label>
+                        <input type="number" id="actualTotal" class="sidik-input" placeholder="Введите реальный тотал">
+                        <button onclick="saveActualResult()" class="sidik-button">💾 Сохранить результат</button>
+                    </div>
+                </div>
+
+                <div class="learning-card">
+                    <h2 class="learning-card-title">
+                        <i>📊</i> Метрики производительности
+                    </h2>
+                    
+                    <div class="performance-metrics">
+                        <div class="metric-card">
+                            <div class="metric-label">Точность системы</div>
+                            <div class="metric-value" id="accuracyMetric">0%</div>
+                            <div class="metric-trend" id="accuracyTrend">-</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Средняя ошибка</div>
+                            <div class="metric-value" id="errorMetric">-</div>
+                            <div class="metric-trend" id="errorTrend">-</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Обучающих матчей</div>
+                            <div class="metric-value" id="matchesMetric">0</div>
+                            <div class="metric-trend">-</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">Уверенность</div>
+                            <div class="metric-value" id="confidenceMetric">0%</div>
+                            <div class="metric-trend">-</div>
+                        </div>
+                    </div>
+
+                    <div class="accuracy-chart" id="accuracyChart">
+                        <!-- График будет сгенерирован JavaScript -->
+                    </div>
+                </div>
+
+                <div class="learning-card">
+                    <h2 class="learning-card-title">
+                        <i>⚖️</i> Веса методов
+                    </h2>
+                    
+                    <div class="model-parameters">
+                        <div class="parameter-item">
+                            <div class="parameter-name">Калькулятор</div>
+                            <div class="parameter-value" id="weightCalc">33%</div>
+                            <div class="parameter-change" id="weightCalcTrend">-</div>
+                        </div>
+                        
+                        <div class="parameter-item">
+                            <div class="parameter-name">Магический</div>
+                            <div class="parameter-value" id="weightMagic">33%</div>
+                            <div class="parameter-change" id="weightMagicTrend">-</div>
+                        </div>
+                        
+                        <div class="parameter-item">
+                            <div class="parameter-name">Сидик</div>
+                            <div class="parameter-value" id="weightSidik">34%</div>
+                            <div class="parameter-change" id="weightSidikTrend">-</div>
+                        </div>
+                    </div>
+
+                    <div class="correction-factor">
+                        <div class="factor-label">Эффективность модели:</div>
+                        <div class="factor-value">
+                            <div class="factor-fill" id="modelEfficiency" style="width: 0%"></div>
+                        </div>
+                        <div style="font-size: 0.75rem; min-width: 40px;" id="efficiencyValue">0%</div>
+                    </div>
+
+                    <div class="confidence-levels">
+                        <div class="confidence-item">
+                            <div class="confidence-name">Калькулятор</div>
+                            <div class="confidence-value" id="confidenceCalc">0%</div>
+                        </div>
+                        
+                        <div class="confidence-item">
+                            <div class="confidence-name">Магический</div>
+                            <div class="confidence-value" id="confidenceMagic">0%</div>
+                        </div>
+                        
+                        <div class="confidence-item">
+                            <div class="confidence-name">Сидик</div>
+                            <div class="confidence-value" id="confidenceSidik">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="learning-card">
+                    <h2 class="learning-card-title">
+                        <i>📈</i> История обучения
+                    </h2>
+                    
+                    <div class="match-history" id="matchHistory">
+                        <!-- История будет сгенерирована JavaScript -->
+                    </div>
+                    
+                    <div class="adaptive-controls">
+                        <button class="adaptive-btn" onclick="resetLearningModel()">
+                            <i>🔄</i> Сбросить модель
+                        </button>
+                        <button class="adaptive-btn primary" onclick="exportLearningData()">
+                            <i>📤</i> Экспорт данных
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- НОВАЯ ВКЛАДКА ЛИГ -->
+        <div class="tab-content" id="leagues-tab">
+            <div class="leagues-container">
+                <div class="learning-card">
+                    <h2 class="learning-card-title">
+                        <i>🏆</i> Управление лигами
+                    </h2>
+                    
+                    <div class="league-selector">
+                        <select id="current-league" class="league-select" onchange="changeLeague()">
+                            <option value="default">Выберите лигу</option>
+                        </select>
+                        <button class="league-manage-btn" onclick="showLeagueModal()">Управление</button>
+                    </div>
+                    
+                    <div id="league-info" style="display: none;">
+                        <div class="league-stats">
+                            <div class="stat-card">
+                                <div class="stat-label">Средний тотал</div>
+                                <div class="stat-value" id="league-avg-total">-</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Средний период</div>
+                                <div class="stat-value" id="league-avg-period">-</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Отклонение</div>
+                                <div class="stat-value" id="league-std-dev">-</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Матчей в базе</div>
+                                <div class="stat-value" id="league-matches-count">-</div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin: 15px 0 10px; color: var(--primary); font-size: 0.9rem;">Коэффициенты времени</h3>
+                        <div class="time-factors-grid">
+                            <div class="form-group">
+                                <label class="form-label">Утро (6-12)</label>
+                                <input type="number" id="league-morning-factor" class="time-factor-input" step="0.01" min="0.5" max="1.5">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">День (12-18)</label>
+                                <input type="number" id="league-day-factor" class="time-factor-input" step="0.01" min="0.5" max="1.5">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Вечер (18-24)</label>
+                                <input type="number" id="league-evening-factor" class="time-factor-input" step="0.01" min="0.5" max="1.5">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Ночь (0-6)</label>
+                                <input type="number" id="league-night-factor" class="time-factor-input" step="0.01" min="0.5" max="1.5">
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions" style="margin-top: 15px;">
+                            <button class="btn btn-primary" onclick="updateLeagueStats()">Обновить статистику</button>
+                            <button class="btn btn-secondary" onclick="saveLeagueFactors()">Сохранить коэффициенты</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="learning-card">
+                    <h2 class="learning-card-title">
+                        <i>📊</i> История матчей лиги
+                    </h2>
+                    
+                    <div class="league-history" id="league-history">
+                        <div style="text-align: center; padding: 20px; opacity: 0.7;">
+                            Выберите лигу для просмотра истории матчей
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="keyboard" id="keyboard">
+    <button class="close-keyboard" onclick="hideKeyboard()">×</button>
+    <button class="key" onclick="pressKey('1')">1</button>
+    <button class="key" onclick="pressKey('2')">2</button>
+    <button class="key" onclick="pressKey('3')">3</button>
+    <button class="key" onclick="pressKey('4')">4</button>
+    <button class="key" onclick="pressKey('5')">5</button>
+    <button class="key" onclick="pressKey('6')">6</button>
+    <button class="key" onclick="pressKey('7')">7</button>
+    <button class="key" onclick="pressKey('8')">8</button>
+    <button class="key" onclick="pressKey('9')">9</button>
+    <button class="key" onclick="pressKey('0')">0</button>
+    <button class="key clear" onclick="clearInput()">C</button>
+    <button class="key submit" onclick="hideKeyboardWithCalculation()">✓</button>
+</div>
+
+<!-- Модальное окно управления лигами -->
+<div class="league-modal" id="league-modal">
+    <div class="league-modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Управление лигами</div>
+            <button class="close-modal" onclick="hideLeagueModal()">×</button>
+        </div>
+        
+        <div class="league-form">
+            <div class="form-group">
+                <label class="form-label">Название лиги</label>
+                <input type="text" id="league-name" class="form-input" placeholder="Введите название лиги">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Средний тотал</label>
+                <input type="number" id="league-avg-total-input" class="form-input" placeholder="Средний тотал за матч">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Средний период</label>
+                <input type="number" id="league-avg-period-input" class="form-input" placeholder="Средний тотал за период">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Стандартное отклонение</label>
+                <input type="number" id="league-std-dev-input" class="form-input" placeholder="Стандартное отклонение">
+            </div>
+            
+            <h3 style="margin: 15px 0 10px; color: var(--primary); font-size: 0.9rem;">Коэффициенты времени</h3>
+            <div class="time-factors-grid">
+                <div class="form-group">
+                    <label class="form-label">Утро (6-12)</label>
+                    <input type="number" id="league-morning-factor-input" class="time-factor-input" step="0.01" min="0.5" max="1.5" value="0.95">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">День (12-18)</label>
+                    <input type="number" id="league-day-factor-input" class="time-factor-input" step="0.01" min="0.5" max="1.5" value="1.0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Вечер (18-24)</label>
+                    <input type="number" id="league-evening-factor-input" class="time-factor-input" step="0.01" min="0.5" max="1.5" value="1.05">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ночь (0-6)</label>
+                    <input type="number" id="league-night-factor-input" class="time-factor-input" step="0.01" min="0.5" max="1.5" value="1.02">
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="saveLeague()">Сохранить лигу</button>
+                <button class="btn btn-secondary" onclick="hideLeagueModal()">Отмена</button>
+            </div>
+        </div>
+        
+        <div class="leagues-list" id="leagues-list">
+            <!-- Список лиг будет сгенерирован здесь -->
+        </div>
+    </div>
+</div>
+
+<script>
+// Глобальные переменные
+let currentInput = null;
+let currentMode = 'two';
+let currentTab = 'calculator';
+let sidikCurrentInput = null;
+
+// Система самообучения - реальные данные
+let learningSystem = {
+    matches: [],
+    model: {
+        weights: { calculator: 0.33, magic: 0.33, sidik: 0.34 },
+        accuracy: { calculator: 0, magic: 0, sidik: 0, combined: 0 },
+        totalMatches: 0,
+        avgError: 0,
+        efficiency: 0,
+        // Новые свойства для отклонений
+        fastDeviation: 0,    // Отклонение от предыдущего матча
+        slowDeviation: 0     // Среднее отклонение по всем матчам
+    },
+    currentPredictions: {
+        calculator: null,
+        magic: null,
+        sidik: null,
+        combined: null,
+        timestamp: null,
+        inputData: {}
+    }
+};
+
+// Система лиг
+let leaguesSystem = {
+    leagues: {
+        "NBA": {
+            name: "NBA",
+            averageTotal: 220,
+            averagePeriod: 55,
+            stdDev: 12,
+            timeFactors: {
+                "morning": 0.95,
+                "afternoon": 1.0,
+                "evening": 1.05,
+                "night": 1.02
+            },
+            matches: []
+        },
+        "Евролига": {
+            name: "Евролига",
+            averageTotal: 160,
+            averagePeriod: 40,
+            stdDev: 10,
+            timeFactors: {
+                "morning": 0.96,
+                "afternoon": 1.0,
+                "evening": 1.04,
+                "night": 1.01
+            },
+            matches: []
+        },
+        "ВТБ": {
+            name: "ВТБ",
+            averageTotal: 165,
+            averagePeriod: 41,
+            stdDev: 11,
+            timeFactors: {
+                "morning": 0.97,
+                "afternoon": 1.0,
+                "evening": 1.03,
+                "night": 1.01
+            },
+            matches: []
+        }
+    },
+    currentLeague: "NBA"
+};
+
+// Функции для работы с лигами
+function initLeaguesSystem() {
+    loadLeaguesData();
+    updateLeaguesUI();
+}
+
+function loadLeaguesData() {
+    const saved = localStorage.getItem('leaguesSystem');
+    if (saved) {
+        try {
+            leaguesSystem = JSON.parse(saved);
+        } catch (e) {
+            console.error('Ошибка загрузки данных лиг:', e);
+        }
+    }
+}
+
+function saveLeaguesData() {
+    localStorage.setItem('leaguesSystem', JSON.stringify(leaguesSystem));
+}
+
+function updateLeaguesUI() {
+    const leagueSelect = document.getElementById('current-league');
+    leagueSelect.innerHTML = '<option value="default">Выберите лигу</option>';
+    
+    Object.keys(leaguesSystem.leagues).forEach(leagueKey => {
+        const league = leaguesSystem.leagues[leagueKey];
+        const option = document.createElement('option');
+        option.value = leagueKey;
+        option.textContent = league.name;
+        if (leagueKey === leaguesSystem.currentLeague) {
+            option.selected = true;
+        }
+        leagueSelect.appendChild(option);
+    });
+    
+    updateLeagueInfo();
+}
+
+function updateLeagueInfo() {
+    const currentLeague = leaguesSystem.leagues[leaguesSystem.currentLeague];
+    if (!currentLeague) {
+        document.getElementById('league-info').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('league-info').style.display = 'block';
+    document.getElementById('league-avg-total').textContent = currentLeague.averageTotal;
+    document.getElementById('league-avg-period').textContent = currentLeague.averagePeriod;
+    document.getElementById('league-std-dev').textContent = currentLeague.stdDev;
+    document.getElementById('league-matches-count').textContent = currentLeague.matches ? currentLeague.matches.length : 0;
+    
+    document.getElementById('league-morning-factor').value = currentLeague.timeFactors.morning;
+    document.getElementById('league-day-factor').value = currentLeague.timeFactors.afternoon;
+    document.getElementById('league-evening-factor').value = currentLeague.timeFactors.evening;
+    document.getElementById('league-night-factor').value = currentLeague.timeFactors.night;
+    
+    updateLeagueHistory();
+}
+
+function updateLeagueHistory() {
+    const historyContainer = document.getElementById('league-history');
+    const currentLeague = leaguesSystem.leagues[leaguesSystem.currentLeague];
+    
+    if (!currentLeague || !currentLeague.matches || currentLeague.matches.length === 0) {
+        historyContainer.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Нет данных о матчах в этой лиге</div>';
+        return;
+    }
+    
+    historyContainer.innerHTML = '';
+    const matches = currentLeague.matches.slice(-10).reverse();
+    
+    matches.forEach(match => {
+        const matchElement = document.createElement('div');
+        matchElement.className = 'history-match';
+        
+        const date = new Date(match.timestamp);
+        const timeStr = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth()+1).toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        
+        matchElement.innerHTML = `
+            <div class="match-teams">
+                <div>${match.team1 || 'Команда 1'} vs ${match.team2 || 'Команда 2'}</div>
+                <div style="font-size: 0.65rem; opacity: 0.7;">${timeStr}</div>
+            </div>
+            <div class="match-score">${match.score1 || 0}-${match.score2 || 0}</div>
+            <div class="match-total">${match.total || 0}</div>
+        `;
+        
+        historyContainer.appendChild(matchElement);
+    });
+}
+
+function changeLeague() {
+    const select = document.getElementById('current-league');
+    leaguesSystem.currentLeague = select.value;
+    saveLeaguesData();
+    updateLeagueInfo();
+}
+
+function showLeagueModal() {
+    document.getElementById('league-modal').style.display = 'flex';
+    updateLeaguesList();
+}
+
+function hideLeagueModal() {
+    document.getElementById('league-modal').style.display = 'none';
+}
+
+function updateLeaguesList() {
+    const listContainer = document.getElementById('leagues-list');
+    listContainer.innerHTML = '';
+    
+    Object.keys(leaguesSystem.leagues).forEach(leagueKey => {
+        const league = leaguesSystem.leagues[leagueKey];
+        const listItem = document.createElement('div');
+        listItem.className = 'league-item';
+        
+        listItem.innerHTML = `
+            <div class="league-info">
+                <div class="league-name">${league.name}</div>
+                <div class="league-details">Тотал: ${league.averageTotal}, Период: ${league.averagePeriod}, Отклонение: ${league.stdDev}</div>
+            </div>
+            <div class="league-actions">
+                <button class="action-btn" onclick="editLeague('${leagueKey}')">✏️</button>
+                <button class="action-btn" onclick="deleteLeague('${leagueKey}')">🗑️</button>
+            </div>
+        `;
+        
+        listContainer.appendChild(listItem);
+    });
+}
+
+function saveLeague() {
+    const name = document.getElementById('league-name').value;
+    const avgTotal = parseFloat(document.getElementById('league-avg-total-input').value);
+    const avgPeriod = parseFloat(document.getElementById('league-avg-period-input').value);
+    const stdDev = parseFloat(document.getElementById('league-std-dev-input').value);
+    
+    if (!name || isNaN(avgTotal) || isNaN(avgPeriod) || isNaN(stdDev)) {
+        alert('Пожалуйста, заполните все поля корректно');
+        return;
+    }
+    
+    const leagueKey = name.replace(/\s+/g, '_').toLowerCase();
+    
+    leaguesSystem.leagues[leagueKey] = {
+        name: name,
+        averageTotal: avgTotal,
+        averagePeriod: avgPeriod,
+        stdDev: stdDev,
+        timeFactors: {
+            morning: parseFloat(document.getElementById('league-morning-factor-input').value),
+            afternoon: parseFloat(document.getElementById('league-day-factor-input').value),
+            evening: parseFloat(document.getElementById('league-evening-factor-input').value),
+            night: parseFloat(document.getElementById('league-night-factor-input').value)
+        },
+        matches: leaguesSystem.leagues[leagueKey] ? leaguesSystem.leagues[leagueKey].matches : []
+    };
+    
+    saveLeaguesData();
+    updateLeaguesUI();
+    updateLeaguesList();
+    hideLeagueModal();
+    
+    // Сбрасываем форму
+    document.getElementById('league-name').value = '';
+    document.getElementById('league-avg-total-input').value = '';
+    document.getElementById('league-avg-period-input').value = '';
+    document.getElementById('league-std-dev-input').value = '';
+}
+
+function editLeague(leagueKey) {
+    const league = leaguesSystem.leagues[leagueKey];
+    
+    document.getElementById('league-name').value = league.name;
+    document.getElementById('league-avg-total-input').value = league.averageTotal;
+    document.getElementById('league-avg-period-input').value = league.averagePeriod;
+    document.getElementById('league-std-dev-input').value = league.stdDev;
+    
+    document.getElementById('league-morning-factor-input').value = league.timeFactors.morning;
+    document.getElementById('league-day-factor-input').value = league.timeFactors.afternoon;
+    document.getElementById('league-evening-factor-input').value = league.timeFactors.evening;
+    document.getElementById('league-night-factor-input').value = league.timeFactors.night;
+    
+    // Удаляем старую лигу при сохранении
+    delete leaguesSystem.leagues[leagueKey];
+}
+
+function deleteLeague(leagueKey) {
+    if (confirm(`Вы уверены, что хотите удалить лигу "${leaguesSystem.leagues[leagueKey].name}"?`)) {
+        delete leaguesSystem.leagues[leagueKey];
+        saveLeaguesData();
+        updateLeaguesUI();
+        updateLeaguesList();
+    }
+}
+
+function updateLeagueStats() {
+    const currentLeague = leaguesSystem.leagues[leaguesSystem.currentLeague];
+    if (!currentLeague || !currentLeague.matches || currentLeague.matches.length === 0) {
+        alert('Нет данных о матчах для обновления статистики');
+        return;
+    }
+    
+    const totals = currentLeague.matches.map(match => match.total);
+    const periods = [];
+    
+    currentLeague.matches.forEach(match => {
+        if (match.periods) {
+            periods.push(...match.periods);
+        }
+    });
+    
+    if (totals.length > 0) {
+        const avgTotal = Math.round(totals.reduce((a, b) => a + b, 0) / totals.length);
+        const avgPeriod = periods.length > 0 ? 
+            Math.round(periods.reduce((a, b) => a + b, 0) / periods.length) : 
+            Math.round(avgTotal / (currentMode === 'two' ? 2 : 3));
+        
+        // Расчет стандартного отклонения
+        const totalVariance = totals.reduce((acc, val) => acc + Math.pow(val - avgTotal, 2), 0) / totals.length;
+        const stdDev = Math.round(Math.sqrt(totalVariance));
+        
+        currentLeague.averageTotal = avgTotal;
+        currentLeague.averagePeriod = avgPeriod;
+        currentLeague.stdDev = stdDev;
+        
+        saveLeaguesData();
+        updateLeagueInfo();
+        
+        alert('Статистика лиги обновлена!');
+    }
+}
+
+function saveLeagueFactors() {
+    const currentLeague = leaguesSystem.leagues[leaguesSystem.currentLeague];
+    if (!currentLeague) return;
+    
+    currentLeague.timeFactors.morning = parseFloat(document.getElementById('league-morning-factor').value);
+    currentLeague.timeFactors.afternoon = parseFloat(document.getElementById('league-day-factor').value);
+    currentLeague.timeFactors.evening = parseFloat(document.getElementById('league-evening-factor').value);
+    currentLeague.timeFactors.night = parseFloat(document.getElementById('league-night-factor').value);
+    
+    saveLeaguesData();
+    alert('Коэффициенты времени сохранены!');
+}
+
+function getTimeFactor(hour) {
+    const currentLeague = leaguesSystem.leagues[leaguesSystem.currentLeague];
+    if (!currentLeague) return 1.0;
+    
+    if (hour >= 6 && hour < 12) return currentLeague.timeFactors.morning;
+    if (hour >= 12 && hour < 18) return currentLeague.timeFactors.afternoon;
+    if (hour >= 18 && hour < 24) return currentLeague.timeFactors.evening;
+    return currentLeague.timeFactors.night;
+}
+
+function applyLeagueCorrection(value) {
+    const currentLeague = leaguesSystem.leagues[leaguesSystem.currentLeague];
+    if (!currentLeague || currentLeague.averageTotal === 220) return value;
+    
+    // Корректируем значение на основе средней статистики лиги
+    const correctionFactor = currentLeague.averageTotal / 220;
+    return Math.round(value * correctionFactor);
+}
+
+// Обновление текущих прогнозов в системе самообучения
+function updateCurrentPredictions() {
+    let calculatorPred, magicPred, sidikPred;
+
+    // Берем данные из калькулятора (доп. расчет для 3 периодов, основной для 2 периодов)
+    if (currentMode === 'three') {
+        const additionalElem = document.getElementById('additionalValue');
+        if (additionalElem && additionalElem.textContent !== '0' && additionalElem.style.display !== 'none') {
+            calculatorPred = parseInt(additionalElem.textContent);
+        } else {
+            calculatorPred = parseInt(document.getElementById('totalValue').textContent);
+        }
+    } else {
+        calculatorPred = parseInt(document.getElementById('totalValue').textContent);
+    }
+
+    // Берем данные из магического квадрата (базовый прогноз)
+    const basePredElem = document.getElementById('basePrediction');
+    if (basePredElem && basePredElem.textContent !== '0') {
+        magicPred = parseInt(basePredElem.textContent);
+    } else {
+        magicPred = null;
+    }
+
+    // Берем данные из Сидика Авгана (общий тотал)
+    const sidikTotalElem = document.getElementById('sidik-totalResult');
+    if (sidikTotalElem && sidikTotalElem.textContent !== '-') {
+        sidikPred = parseInt(sidikTotalElem.textContent);
+    } else {
+        sidikPred = null;
+    }
+
+    learningSystem.currentPredictions = {
+        calculator: calculatorPred !== 0 ? calculatorPred : null,
+        magic: magicPred !== 0 ? magicPred : null,
+        sidik: sidikPred !== 0 ? sidikPred : null,
+        timestamp: new Date().toISOString(),
+        inputData: getCurrentInputData()
+    };
+    
+    // Рассчитываем комбинированный прогноз
+    calculateCombinedPrediction();
+    
+    // Обновляем UI
+    updateCurrentPredictionsUI();
+    
+    // Анализируем тренд
+    analyzeTrendDirection();
+}
+
+// Расчет комбинированного прогноза с учетом доступных данных
+function calculateCombinedPrediction() {
+    const pred = learningSystem.currentPredictions;
+    const weights = learningSystem.model.weights;
+    
+    let totalWeight = 0;
+    let weightedSum = 0;
+    
+    if (pred.calculator && !isNaN(pred.calculator)) {
+        weightedSum += pred.calculator * weights.calculator;
+        totalWeight += weights.calculator;
+    }
+    
+    if (pred.magic && !isNaN(pred.magic)) {
+        weightedSum += pred.magic * weights.magic;
+        totalWeight += weights.magic;
+    }
+    
+    if (pred.sidik && !isNaN(pred.sidik)) {
+        weightedSum += pred.sidik * weights.sidik;
+        totalWeight += weights.sidik;
+    }
+    
+    if (totalWeight > 0) {
+        pred.combined = Math.round(weightedSum / totalWeight);
+    } else {
+        pred.combined = null;
+    }
+}
+
+// Обновление UI текущих прогнозов
+function updateCurrentPredictionsUI() {
+    const pred = learningSystem.currentPredictions;
+    
+    document.getElementById('currentCalcPred').textContent = pred.calculator || '-';
+    document.getElementById('currentMagicPred').textContent = pred.magic || '-';
+    document.getElementById('currentSidikPred').textContent = pred.sidik || '-';
+    document.getElementById('combinedPrediction').textContent = pred.combined || '-';
+    
+    // Добавляем визуальные индикаторы источников данных
+    updatePredictionSourceIndicators();
+}
+
+// Визуальные индикаторы источников данных
+function updatePredictionSourceIndicators() {
+    const pred = learningSystem.currentPredictions;
+    
+    const indicators = {
+        calc: document.getElementById('currentCalcPred'),
+        magic: document.getElementById('currentMagicPred'),
+        sidik: document.getElementById('currentSidikPred')
+    };
+    
+    // Сбрасываем стили
+    Object.values(indicators).forEach(indicator => {
+        indicator.style.background = 'transparent';
+        indicator.style.border = 'none';
+        indicator.style.borderRadius = '0';
+    });
+    
+    // Устанавливаем стили в зависимости от режима и доступности данных
+    if (currentMode === 'three') {
+        // В режиме 3 периодов подсвечиваем дополнительный расчет
+        if (document.getElementById('additionalResult').style.display !== 'none') {
+            indicators.calc.style.background = 'rgba(247, 37, 133, 0.2)';
+            indicators.calc.style.border = '1px solid var(--secondary)';
+            indicators.calc.style.borderRadius = '4px';
+        }
+    }
+    
+    // Магический квадрат всегда использует базовый прогноз
+    if (pred.magic) {
+        indicators.magic.style.background = 'rgba(76, 201, 240, 0.2)';
+        indicators.magic.style.border = '1px solid var(--primary)';
+        indicators.magic.style.borderRadius = '4px';
+    }
+    
+    // Сидик Авган всегда использует общий тотал
+    if (pred.sidik) {
+        indicators.sidik.style.background = 'rgba(255, 193, 7, 0.2)';
+        indicators.sidik.style.border = '1px solid #ffc107';
+        indicators.sidik.style.borderRadius = '4px';
+    }
+}
+
+// НОВЫЕ ФУНКЦИИ ДЛЯ АНАЛИЗА ТРЕНДА
+
+function analyzeTrendDirection() {
+    const trendAnalysis = document.getElementById('trendAnalysis');
+    
+    // Получаем данные из всех источников
+    const calcPred = learningSystem.currentPredictions.calculator;
+    const magicPred = learningSystem.currentPredictions.magic;
+    const sidikPred = learningSystem.currentPredictions.sidik;
+    
+    // Получаем исторические данные для анализа тренда
+    const inputData = learningSystem.currentPredictions.inputData;
+    
+    let trendData = {
+        direction: 'neutral', // 'up', 'down', 'neutral'
+        strength: 0, // 0-100
+        confidence: 0, // 0-100
+        recommendation: '',
+        details: '',
+        agreement: 0, // согласованность методов
+        volatility: 0,
+        momentum: 0
+    };
+    
+    // Если недостаточно данных, скрываем блок
+    if (!calcPred && !magicPred && !sidikPred) {
+        trendAnalysis.style.display = 'none';
+        return trendData;
+    }
+    
+    // Показываем блок анализа
+    trendAnalysis.style.display = 'block';
+    
+    // Анализируем данные из калькулятора
+    let calcTrend = analyzeCalculatorTrend(inputData);
+    let magicTrend = analyzeMagicTrend();
+    let analyticsTrend = analyzeAnalyticsTrend();
+    
+    // Собираем все тренды
+    const trends = [];
+    if (calcTrend) trends.push(calcTrend);
+    if (magicTrend) trends.push(magicTrend);
+    if (analyticsTrend) trends.push(analyticsTrend);
+    
+    // Если есть тренды, анализируем общее направление
+    if (trends.length > 0) {
+        trendData = calculateOverallTrend(trends);
+    } else {
+        trendData = {
+            direction: 'neutral',
+            strength: 0,
+            confidence: 0,
+            recommendation: 'Недостаточно данных для анализа тренда',
+            details: 'Введите данные периодов для получения рекомендаций',
+            agreement: 0,
+            volatility: 0,
+            momentum: 0
+        };
+    }
+    
+    // Обновляем UI
+    updateTrendUI(trendData);
+    
+    return trendData;
+}
+
+function analyzeCalculatorTrend(inputData) {
+    if (!inputData || !inputData.totalFirstPeriod) return null;
+    
+    const p1 = inputData.totalFirstPeriod;
+    const p2 = inputData.totalSecondPeriod;
+    const p3 = inputData.totalThirdPeriod;
+    
+    let direction = 'neutral';
+    let strength = 0;
+    
+    if (currentMode === 'two') {
+        // Анализ для 2 периодов
+        const diff = p2 - p1;
+        if (diff > 5) {
+            direction = 'up';
+            strength = Math.min(100, (diff / p1) * 200);
+        } else if (diff < -5) {
+            direction = 'down';
+            strength = Math.min(100, Math.abs(diff / p1) * 200);
+        }
+    } else {
+        // Анализ для 3 периодов
+        const trends = [];
+        if (p2 > p1) trends.push('up');
+        if (p3 > p2) trends.push('up');
+        if (p2 < p1) trends.push('down');
+        if (p3 < p2) trends.push('down');
+        
+        const upCount = trends.filter(t => t === 'up').length;
+        const downCount = trends.filter(t => t === 'down').length;
+        
+        if (upCount > downCount) {
+            direction = 'up';
+            strength = (upCount / 2) * 100;
+        } else if (downCount > upCount) {
+            direction = 'down';
+            strength = (downCount / 2) * 100;
+        }
+        
+        // Учитываем величину изменений
+        const avgChange = ((p2 - p1) + (p3 - p2)) / 2;
+        strength = Math.min(100, strength + Math.abs(avgChange) * 2);
+    }
+    
+    return {
+        source: 'calculator',
+        direction: direction,
+        strength: strength,
+        confidence: Math.min(100, strength * 0.8)
+    };
+}
+
+function analyzeMagicTrend() {
+    const trendValueElem = document.getElementById('trendValue');
+    const energyValueElem = document.getElementById('energyValue');
+    
+    if (!trendValueElem || trendValueElem.textContent === '1.0x') return null;
+    
+    const trendText = trendValueElem.textContent;
+    let direction = 'neutral';
+    let strength = 0;
+    
+    if (trendText.includes('1.1')) {
+        direction = 'up';
+        strength = 70;
+    } else if (trendText.includes('0.9')) {
+        direction = 'down';
+        strength = 70;
+    }
+    
+    // Учитываем энергию магического квадрата
+    if (energyValueElem && energyValueElem.textContent !== '0%') {
+        const energy = parseInt(energyValueElem.textContent);
+        strength = Math.min(100, strength + (energy / 100) * 30);
+    }
+    
+    return {
+        source: 'magic',
+        direction: direction,
+        strength: strength,
+        confidence: Math.min(100, strength * 0.9)
+    };
+}
+
+function analyzeAnalyticsTrend() {
+    const trendIndicator = document.getElementById('trendIndicator');
+    if (!trendIndicator) return null;
+    
+    let direction = 'neutral';
+    let strength = 0;
+    
+    if (trendIndicator.classList.contains('trend-up')) {
+        direction = 'up';
+        strength = 75;
+    } else if (trendIndicator.classList.contains('trend-down')) {
+        direction = 'down';
+        strength = 75;
+    }
+    
+    // Учитываем уверенность методов аналитики
+    const expSmoothConfidence = parseInt(document.getElementById('expSmoothConfidence')?.style.width) || 0;
+    const weightedRegConfidence = parseInt(document.getElementById('weightedRegConfidence')?.style.width) || 0;
+    const adaptiveConfidence = parseInt(document.getElementById('adaptiveConfidence')?.style.width) || 0;
+    
+    const avgConfidence = (expSmoothConfidence + weightedRegConfidence + adaptiveConfidence) / 3;
+    strength = Math.min(100, strength + (avgConfidence / 100) * 25);
+    
+    return {
+        source: 'analytics',
+        direction: direction,
+        strength: strength,
+        confidence: Math.min(100, avgConfidence * 0.8)
+    };
+}
+
+function calculateOverallTrend(trends) {
+    if (trends.length === 0) {
+        return {
+            direction: 'neutral',
+            strength: 0,
+            confidence: 0,
+            recommendation: 'Недостаточно данных',
+            details: 'Требуется больше информации для анализа',
+            agreement: 0,
+            volatility: 0,
+            momentum: 0
+        };
+    }
+    
+    // Подсчитываем голоса за каждое направление
+    const votes = { up: 0, down: 0, neutral: 0 };
+    let totalStrength = 0;
+    let totalConfidence = 0;
+    
+    trends.forEach(trend => {
+        votes[trend.direction]++;
+        totalStrength += trend.strength;
+        totalConfidence += trend.confidence;
+    });
+    
+    // Определяем преобладающее направление
+    let overallDirection = 'neutral';
+    if (votes.up > votes.down && votes.up > votes.neutral) {
+        overallDirection = 'up';
+    } else if (votes.down > votes.up && votes.down > votes.neutral) {
+        overallDirection = 'down';
+    }
+    
+    // Рассчитываем согласованность методов
+    const agreement = (Math.max(votes.up, votes.down, votes.neutral) / trends.length) * 100;
+    
+    // Средние показатели
+    const avgStrength = totalStrength / trends.length;
+    const avgConfidence = totalConfidence / trends.length;
+    
+    // Генерируем рекомендации
+    const recommendation = generateRecommendation(overallDirection, avgStrength, agreement);
+    
+    return {
+        direction: overallDirection,
+        strength: Math.round(avgStrength),
+        confidence: Math.round(avgConfidence),
+        recommendation: recommendation.text,
+        details: recommendation.details,
+        agreement: Math.round(agreement),
+        volatility: calculateVolatility(),
+        momentum: calculateMomentum(overallDirection, avgStrength)
+    };
+}
+
+function generateRecommendation(direction, strength, agreement) {
+    let text = '';
+    let details = '';
+    
+    if (direction === 'up') {
+        if (strength > 70 && agreement > 70) {
+            text = '🎯 СИЛЬНЫЙ СИГНАЛ НА ПОВЫШЕНИЕ';
+            details = 'Все методы указывают на рост. Рекомендуется играть на ТБ (тотал больше)';
+        } else if (strength > 50) {
+            text = '📈 УМЕРЕННЫЙ РОСТ';
+            details = 'Преобладают сигналы роста. Рассмотрите ставки на повышение';
+        } else {
+            text = '↗️ СЛАБЫЙ РОСТ';
+            details = 'Есть признаки роста, но необходима осторожность';
+        }
+    } else if (direction === 'down') {
+        if (strength > 70 && agreement > 70) {
+            text = '🎯 СИЛЬНЫЙ СИГНАЛ НА ПОНИЖЕНИЕ';
+            details = 'Все методы указывают на падение. Рекомендуется играть на ТМ (тотал меньше)';
+        } else if (strength > 50) {
+            text = '📉 УМЕРЕННОЕ ПАДЕНИЕ';
+            details = 'Преобладают сигналы падения. Рассмотрите ставки на понижение';
+        } else {
+            text = '↘️ СЛАБОЕ ПАДЕНИЕ';
+            details = 'Есть признаки падения, но необходима осторожность';
+        }
+    } else {
+        text = '➡️ СТАБИЛЬНАЯ ДИНАМИКА';
+        details = 'Тренд не выражен. Рекомендуется дождаться clearer signals';
+    }
+    
+    return { text, details };
+}
+
+function calculateVolatility() {
+    // Простой расчет волатильности на основе исторических данных
+    const matches = learningSystem.matches;
+    if (matches.length < 2) return 50;
+    
+    const errors = matches.map(match => 
+        Math.abs(match.predictions.combined - match.actual)
+    );
+    
+    const avgError = errors.reduce((a, b) => a + b, 0) / errors.length;
+    const maxPossibleError = 50; // Предполагаем максимальную ошибку 50 очков
+    
+    return Math.round((avgError / maxPossibleError) * 100);
+}
+
+function calculateMomentum(direction, strength) {
+    // Расчет импульса на основе силы и направления тренда
+    let momentum = strength;
+    
+    if (direction === 'up') {
+        momentum += 20;
+    } else if (direction === 'down') {
+        momentum -= 20;
+    }
+    
+    return Math.max(0, Math.min(100, momentum));
+}
+
+function updateTrendUI(trendData) {
+    const trendArrow = document.getElementById('trendArrow');
+    const trendRecommendation = document.getElementById('trendRecommendation');
+    const trendDetails = document.getElementById('trendDetails');
+    const trendConfidence = document.getElementById('trendConfidence');
+    const trendStrength = document.getElementById('trendStrength');
+    const trendAgreement = document.getElementById('trendAgreement');
+    const trendVolatility = document.getElementById('trendVolatility');
+    const trendMomentum = document.getElementById('trendMomentum');
+    
+    // Обновляем стрелку направления
+    trendArrow.className = 'trend-arrow';
+    if (trendData.direction === 'up') {
+        trendArrow.textContent = '↗️';
+        trendArrow.classList.add('up');
+    } else if (trendData.direction === 'down') {
+        trendArrow.textContent = '↘️';
+        trendArrow.classList.add('down');
+    } else {
+        trendArrow.textContent = '➡️';
+        trendArrow.classList.add('neutral');
+    }
+    
+    // Добавляем анимацию для сильных трендов
+    if (trendData.strength > 70) {
+        trendArrow.classList.add('strong');
+    }
+    
+    // Обновляем текстовые элементы
+    trendRecommendation.textContent = trendData.recommendation;
+    trendDetails.textContent = trendData.details;
+    trendConfidence.textContent = `Уверенность: ${trendData.confidence}%`;
+    
+    // Обновляем метрики
+    trendStrength.textContent = `${trendData.strength}%`;
+    trendAgreement.textContent = `${trendData.agreement}%`;
+    trendVolatility.textContent = `${trendData.volatility}%`;
+    trendMomentum.textContent = `${trendData.momentum}%`;
+}
+
+// Инициализация системы самообучения
+function initLearningSystem() {
+    loadLearningData();
+    updateCurrentPredictions();
+    updateLearningUI();
+    generateAccuracyChart();
+    loadMatchHistory();
+    updatePredictionSourceIndicators();
+    updateDeviationIndicators();
+    
+    // Инициализируем анализ тренда
+    analyzeTrendDirection();
+}
+
+// Загрузка данных обучения
+function loadLearningData() {
+    const saved = localStorage.getItem('learningSystem');
+    if (saved) {
+        try {
+            learningSystem = JSON.parse(saved);
+        } catch (e) {
+            console.error('Ошибка загрузки данных обучения:', e);
+            resetLearningModel();
+        }
+    }
+}
+
+// Сохранение данных обучения
+function saveLearningData() {
+    localStorage.setItem('learningSystem', JSON.stringify(learningSystem));
+}
+
+// Получение текущих входных данных
+function getCurrentInputData() {
+    const team1p1 = parseInt(document.getElementById('team1-period1').value) || 0;
+    const team2p1 = parseInt(document.getElementById('team2-period1').value) || 0;
+    const team1p2 = parseInt(document.getElementById('team1-period2').value) || 0;
+    const team2p2 = parseInt(document.getElementById('team2-period2').value) || 0;
+    const team1p3 = parseInt(document.getElementById('team1-period3').value) || 0;
+    const team2p3 = parseInt(document.getElementById('team2-period3').value) || 0;
+    
+    return {
+        team1p1, team2p1, team1p2, team2p2, team1p3, team2p3,
+        mode: currentMode,
+        totalFirstPeriod: team1p1 + team2p1,
+        totalSecondPeriod: team1p2 + team2p2,
+        totalThirdPeriod: team1p3 + team2p3
+    };
+}
+
+// Сохранение реального результата
+function saveActualResult() {
+    const actualTotal = parseInt(document.getElementById('actualTotal').value);
+    if (!actualTotal) {
+        alert('Введите корректный реальный тотал');
+        return;
+    }
+    
+    const matchRecord = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        predictions: { ...learningSystem.currentPredictions },
+        actual: actualTotal,
+        inputData: learningSystem.currentPredictions.inputData
+    };
+    
+    learningSystem.matches.push(matchRecord);
+    learningSystem.model.totalMatches = learningSystem.matches.length;
+    
+    // Пересчитываем модель
+    updateLearningModel();
+    
+    // Обновляем отклонения
+    updateDeviations();
+    
+    // Сохраняем данные
+    saveLearningData();
+    
+    // Обновляем UI
+    updateLearningUI();
+    loadMatchHistory();
+    updateDeviationIndicators();
+    
+    // Очищаем поле ввода
+    document.getElementById('actualTotal').value = '';
+    
+    showLearningNotification('Результат сохранен! Модель обновлена.');
+}
+
+// Обновление отклонений
+function updateDeviations() {
+    const matches = learningSystem.matches;
+    
+    if (matches.length === 0) {
+        learningSystem.model.fastDeviation = 0;
+        learningSystem.model.slowDeviation = 0;
+        return;
+    }
+    
+    // Быстрое отклонение - разница между прогнозом и реальным результатом в последнем матче
+    const lastMatch = matches[matches.length - 1];
+    if (lastMatch.predictions.combined && lastMatch.actual) {
+        learningSystem.model.fastDeviation = Math.abs(lastMatch.predictions.combined - lastMatch.actual);
+    }
+    
+    // Медленное отклонение - средняя ошибка по всем матчам
+    if (matches.length > 0) {
+        let totalError = 0;
+        let count = 0;
+        
+        matches.forEach(match => {
+            if (match.predictions.combined && match.actual) {
+                totalError += Math.abs(match.predictions.combined - match.actual);
+                count++;
+            }
+        });
+        
+        if (count > 0) {
+            learningSystem.model.slowDeviation = Math.round(totalError / count);
+        }
+    }
+}
+
+// Обновление индикаторов отклонений
+function updateDeviationIndicators() {
+    const fastDeviation = learningSystem.model.fastDeviation;
+    const slowDeviation = learningSystem.model.slowDeviation;
+    
+    // Обновляем значения
+    document.getElementById('fastDeviationValue').textContent = fastDeviation > 0 ? fastDeviation : '-';
+    document.getElementById('slowDeviationValue').textContent = slowDeviation > 0 ? slowDeviation : '-';
+    
+    // Добавляем визуальные индикаторы качества
+    const fastIndicator = document.getElementById('fastDeviationIndicator');
+    const slowIndicator = document.getElementById('slowDeviationIndicator');
+    
+    // Сбрасываем стили
+    fastIndicator.style.background = 'rgba(255, 255, 255, 0.05)';
+    fastIndicator.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+    slowIndicator.style.background = 'rgba(255, 255, 255, 0.05)';
+    slowIndicator.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+    
+    // Устанавливаем стили в зависимости от качества отклонений
+    if (fastDeviation > 0) {
+        if (fastDeviation <= 5) {
+            fastIndicator.style.background = 'rgba(34, 197, 94, 0.1)';
+            fastIndicator.style.borderColor = '#22c55e';
+        } else if (fastDeviation <= 10) {
+            fastIndicator.style.background = 'rgba(234, 179, 8, 0.1)';
+            fastIndicator.style.borderColor = '#eab308';
+        } else {
+            fastIndicator.style.background = 'rgba(239, 68, 68, 0.1)';
+            fastIndicator.style.borderColor = '#ef4444';
+        }
+    }
+    
+    if (slowDeviation > 0) {
+        if (slowDeviation <= 5) {
+            slowIndicator.style.background = 'rgba(34, 197, 94, 0.1)';
+            slowIndicator.style.borderColor = '#22c55e';
+        } else if (slowDeviation <= 10) {
+            slowIndicator.style.background = 'rgba(234, 179, 8, 0.1)';
+            slowIndicator.style.borderColor = '#eab308';
+        } else {
+            slowIndicator.style.background = 'rgba(239, 68, 68, 0.1)';
+            slowIndicator.style.borderColor = '#ef4444';
+        }
+    }
+}
+
+// Обновление модели обучения
+function updateLearningModel() {
+    const matches = learningSystem.matches.filter(m => m.actual && m.predictions.combined);
+    if (matches.length < 2) return;
+    
+    // Рассчитываем ошибки для каждого метода
+    const errors = {
+        calculator: 0,
+        magic: 0,
+        sidik: 0
+    };
+    
+    const accuracies = {
+        calculator: 0,
+        magic: 0,
+        sidik: 0,
+        combined: 0
+    };
+    
+    let totalError = 0;
+    let accuratePredictions = 0;
+    
+    matches.forEach(match => {
+        // Ошибки для каждого метода
+        if (match.predictions.calculator) {
+            const error = Math.abs(match.predictions.calculator - match.actual);
+            errors.calculator += error;
+            if (error <= 5) accuracies.calculator++;
+        }
+        
+        if (match.predictions.magic) {
+            const error = Math.abs(match.predictions.magic - match.actual);
+            errors.magic += error;
+            if (error <= 5) accuracies.magic++;
+        }
+        
+        if (match.predictions.sidik) {
+            const error = Math.abs(match.predictions.sidik - match.actual);
+            errors.sidik += error;
+            if (error <= 5) accuracies.sidik++;
+        }
+        
+        // Общая ошибка комбинированного прогноза
+        if (match.predictions.combined) {
+            const error = Math.abs(match.predictions.combined - match.actual);
+            totalError += error;
+            if (error <= 5) {
+                accuratePredictions++;
+                accuracies.combined++;
+            }
+        }
+    });
+    
+    // Рассчитываем точность для каждого метода
+    learningSystem.model.accuracy.calculator = Math.round((accuracies.calculator / matches.length) * 100);
+    learningSystem.model.accuracy.magic = Math.round((accuracies.magic / matches.length) * 100);
+    learningSystem.model.accuracy.sidik = Math.round((accuracies.sidik / matches.length) * 100);
+    learningSystem.model.accuracy.combined = Math.round((accuracies.combined / matches.length) * 100);
+    
+    // Средняя ошибка
+    learningSystem.model.avgError = Math.round((totalError / matches.length) * 10) / 10;
+    
+    // Обновляем веса на основе ошибок (меньшая ошибка = больший вес)
+    const totalInverseError = 
+        (1 / (errors.calculator || 1)) + 
+        (1 / (errors.magic || 1)) + 
+        (1 / (errors.sidik || 1));
+    
+    learningSystem.model.weights = {
+        calculator: (1 / (errors.calculator || 1)) / totalInverseError,
+        magic: (1 / (errors.magic || 1)) / totalInverseError,
+        sidik: (1 / (errors.sidik || 1)) / totalInverseError
+    };
+    
+    // Эффективность модели
+    learningSystem.model.efficiency = learningSystem.model.accuracy.combined;
+    
+    // Обновляем отклонения
+    updateDeviations();
+}
+
+// Обновление UI системы обучения
+function updateLearningUI() {
+    const model = learningSystem.model;
+    
+    // Метрики
+    document.getElementById('accuracyMetric').textContent = model.accuracy.combined + '%';
+    document.getElementById('errorMetric').textContent = model.avgError.toFixed(1);
+    document.getElementById('matchesMetric').textContent = model.totalMatches;
+    document.getElementById('confidenceMetric').textContent = Math.round(
+        (model.accuracy.calculator + model.accuracy.magic + model.accuracy.sidik) / 3
+    ) + '%';
+    
+    // Веса методов
+    document.getElementById('weightCalc').textContent = Math.round(model.weights.calculator * 100) + '%';
+    document.getElementById('weightMagic').textContent = Math.round(model.weights.magic * 100) + '%';
+    document.getElementById('weightSidik').textContent = Math.round(model.weights.sidik * 100) + '%';
+    
+    // Уверенность методов
+    document.getElementById('confidenceCalc').textContent = model.accuracy.calculator + '%';
+    document.getElementById('confidenceMagic').textContent = model.accuracy.magic + '%';
+    document.getElementById('confidenceSidik').textContent = model.accuracy.sidik + '%';
+    
+    // Эффективность модели
+    document.getElementById('modelEfficiency').style.width = model.efficiency + '%';
+    document.getElementById('efficiencyValue').textContent = model.efficiency + '%';
+}
+
+// Загрузка истории матчей
+function loadMatchHistory() {
+    const historyContainer = document.getElementById('matchHistory');
+    historyContainer.innerHTML = '';
+    
+    const matches = learningSystem.matches.slice(-10).reverse(); // Последние 10 матчей
+    
+    if (matches.length === 0) {
+        historyContainer.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Нет данных о матчах</div>';
+        return;
+    }
+    
+    matches.forEach(match => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        
+        const date = new Date(match.timestamp);
+        const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        
+        const error = match.actual - match.predictions.combined;
+        const success = Math.abs(error) <= 5;
+        
+        historyItem.innerHTML = `
+            <div>
+                <span class="history-prediction">${match.predictions.combined}</span> → 
+                <span class="history-actual">${match.actual}</span>
+                <div style="font-size: 0.65rem; opacity: 0.7;">${timeStr}</div>
+            </div>
+            <div class="${success ? 'history-success' : 'history-error'}">
+                ${success ? '✓' : '✗'} ${error > 0 ? '+' : ''}${error}
+            </div>
+        `;
+        
+        historyContainer.appendChild(historyItem);
+    });
+}
+
+// Генерация графика точности
+function generateAccuracyChart() {
+    const chart = document.getElementById('accuracyChart');
+    chart.innerHTML = '';
+    
+    const matches = learningSystem.matches;
+    if (matches.length < 2) {
+        chart.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; opacity: 0.7;">Недостаточно данных</div>';
+        return;
+    }
+    
+    // Берем последние 7 матчей или все, если меньше
+    const recentMatches = matches.slice(-7);
+    const accuracyData = [];
+    
+    // Рассчитываем точность для каждого матча в скользящем окне
+    for (let i = 0; i < recentMatches.length; i++) {
+        const windowMatches = matches.slice(0, i + 1);
+        const accurate = windowMatches.filter(m => Math.abs(m.predictions.combined - m.actual) <= 5).length;
+        accuracyData.push(Math.round((accurate / windowMatches.length) * 100));
+    }
+    
+    const maxAccuracy = Math.max(...accuracyData, 80); // Минимум 80% для масштаба
+    
+    accuracyData.forEach((value, index) => {
+        const bar = document.createElement('div');
+        bar.className = 'chart-bar' + (index === accuracyData.length - 1 ? ' current' : '');
+        bar.style.height = (value / maxAccuracy * 100) + '%';
+        
+        const label = document.createElement('div');
+        label.className = 'chart-label';
+        label.textContent = value + '%';
+        
+        bar.appendChild(label);
+        chart.appendChild(bar);
+    });
+}
+
+// Сброс модели обучения
+function resetLearningModel() {
+    if (confirm('Вы уверены, что хотите сбросить модель обучения? Все накопленные данные будут потеряны.')) {
+        learningSystem = {
+            matches: [],
+            model: {
+                weights: { calculator: 0.33, magic: 0.33, sidik: 0.34 },
+                accuracy: { calculator: 0, magic: 0, sidik: 0, combined: 0 },
+                totalMatches: 0,
+                avgError: 0,
+                efficiency: 0,
+                fastDeviation: 0,
+                slowDeviation: 0
+            },
+            currentPredictions: {
+                calculator: null,
+                magic: null,
+                sidik: null,
+                combined: null,
+                timestamp: null,
+                inputData: {}
+            }
+        };
+        
+        saveLearningData();
+        updateLearningUI();
+        loadMatchHistory();
+        generateAccuracyChart();
+        updateDeviationIndicators();
+        showLearningNotification('Модель обучения сброшена!');
+    }
+}
+
+// Экспорт данных обучения
+function exportLearningData() {
+    const dataStr = JSON.stringify(learningSystem, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `learning_data_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    showLearningNotification('Данные экспортированы!');
+}
+
+// Показать уведомление об обучении
+function showLearningNotification(message) {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 2px solid var(--primary);
+        z-index: 1001;
+        font-size: 0.9rem;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        document.body.removeChild(notification);
+    }, 2000);
+}
+
+// Управление вкладками
+function setTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById(`${tab}-tab`).classList.add('active');
+    
+    if (tab === 'visualization') {
+        updateVisualization();
+    } else if (tab === 'magic') {
+        updateMagicSquare();
+    } else if (tab === 'sidik') {
+        updateSidikCurrentDateTime();
+        document.getElementById('sidik-customKeyboard').style.display = 'none';
+        autoCalculateSidik();
+    } else if (tab === 'learning') {
+        initLearningSystem();
+    } else if (tab === 'leagues') {
+        initLeaguesSystem();
+    }
+    
+    // Обновляем текущие прогнозы при переключении вкладок
+    updateCurrentPredictions();
+}
+
+// Управление режимами
+function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    const thirdPeriod = document.getElementById('third-period');
+    const additionalResult = document.getElementById('additionalResult');
+    
+    if (mode === 'three') {
+        thirdPeriod.style.display = 'block';
+        additionalResult.style.display = 'none';
+    } else {
+        thirdPeriod.style.display = 'none';
+        additionalResult.style.display = 'none';
+    }
+    
+    document.getElementById('result').style.display = 'none';
+    
+    if (currentTab === 'visualization') {
+        updateVisualization();
+    } else if (currentTab === 'magic') {
+        updateMagicSquare();
+    }
+    
+    updateSidikFromCalculator();
+    updateCurrentPredictions();
+}
+
+// Управление темами
+function setTheme(theme) {
+    document.body.className = `theme-${theme}`;
+    document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    localStorage.setItem('selectedTheme', theme);
+}
+
+// Очистка данных
+function clearAllData() {
+    document.querySelectorAll('.score-input').forEach(input => {
+        input.value = '0';
+    });
+    
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('additionalResult').style.display = 'none';
+    document.getElementById('magicResult').style.display = 'none';
+    
+    hideKeyboard();
+    
+    if (currentTab === 'visualization') {
+        updateVisualization();
+    } else if (currentTab === 'magic') {
+        updateMagicSquare();
+    }
+    
+    updateSidikFromCalculator();
+    updateCurrentPredictions();
+    showClearNotification();
+}
+
+function showClearNotification() {
+    const notification = document.createElement('div');
+    notification.textContent = 'Данные очищены!';
+    notification.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 2px solid var(--primary);
+        z-index: 1001;
+        font-size: 0.9rem;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        document.body.removeChild(notification);
+    }, 1500);
+}
+
+// Управление клавиатурой
+function showKeyboard(input) {
+    currentInput = input;
+    const keyboard = document.getElementById('keyboard');
+    keyboard.classList.add('active');
+    input.blur();
+    
+    setTimeout(() => {
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+}
+
+function hideKeyboard() {
+    document.getElementById('keyboard').classList.remove('active');
+    currentInput = null;
+}
+
+function hideKeyboardWithCalculation() {
+    hideKeyboard();
+    calculateTotal();
+    if (currentTab === 'visualization') {
+        updateVisualization();
+    } else if (currentTab === 'magic') {
+        updateMagicSquare();
+    }
+    
+    updateSidikFromCalculator();
+    updateCurrentPredictions();
+}
+
+function pressKey(key) {
+    if (currentInput) {
+        const currentValue = currentInput.value;
+        currentInput.value = currentValue === '0' ? key : currentValue + key;
+    }
+}
+
+function clearInput() {
+    if (currentInput) currentInput.value = '0';
+}
+
+// Обработчики событий
+document.addEventListener('click', function(event) {
+    const keyboard = document.getElementById('keyboard');
+    const scoreInputs = document.querySelectorAll('.score-input');
+    if (!keyboard.contains(event.target) && !Array.from(scoreInputs).some(input => input.contains(event.target))) {
+        hideKeyboard();
+    }
+});
+
+document.querySelectorAll('.score-input').forEach(input => {
+    input.addEventListener('focus', function(e) {
+        e.preventDefault();
+        this.blur();
+    });
+    
+    input.addEventListener('input', function() {
+        if (currentTab === 'visualization') {
+            updateVisualization();
+        } else if (currentTab === 'magic') {
+            updateMagicSquare();
+        }
+        
+        updateSidikFromCalculator();
+        updateCurrentPredictions();
+    });
+});
+
+// Основной расчет
+function calculateTotal() {
+    let total;
+    let additionalTotal = null;
+    
+    if (currentMode === 'two') {
+        const team1p1 = parseInt(document.getElementById('team1-period1').value) || 0;
+        const team2p1 = parseInt(document.getElementById('team2-period1').value) || 0;
+        const team1p2 = parseInt(document.getElementById('team1-period2').value) || 0;
+        const team2p2 = parseInt(document.getElementById('team2-period2').value) || 0;
+
+        const totalFirstPeriod = team1p1 + team2p1;
+        const totalSecondPeriod = team1p2 + team2p2;
+        
+        total = (totalFirstPeriod + totalSecondPeriod) * 2;
+
+        if (totalFirstPeriod > totalSecondPeriod) {
+            total += (totalFirstPeriod - totalSecondPeriod);
+        } else {
+            total -= (totalSecondPeriod - totalFirstPeriod);
+        }
+    } else {
+        const team1p1 = parseInt(document.getElementById('team1-period1').value) || 0;
+        const team2p1 = parseInt(document.getElementById('team2-period1').value) || 0;
+        const team1p2 = parseInt(document.getElementById('team1-period2').value) || 0;
+        const team2p2 = parseInt(document.getElementById('team2-period2').value) || 0;
+        const team1p3 = parseInt(document.getElementById('team1-period3').value) || 0;
+        const team2p3 = parseInt(document.getElementById('team2-period3').value) || 0;
+
+        const totalFirstPeriod = team1p1 + team2p1;
+        const totalSecondPeriod = team1p2 + team2p2;
+        const totalThirdPeriod = team1p3 + team2p3;
+        
+        total = (totalFirstPeriod + totalSecondPeriod + totalThirdPeriod) * (4/3);
+        
+        if (totalThirdPeriod > totalSecondPeriod) {
+            total += (totalThirdPeriod - totalSecondPeriod);
+        } else {
+            total -= (totalSecondPeriod - totalThirdPeriod);
+        }
+        
+        total = Math.round(total);
+
+        // Дополнительный расчет
+        const twoPeriodTotal = (totalFirstPeriod + totalSecondPeriod) * 2;
+        const diffTwoPeriods = Math.abs(totalFirstPeriod - totalSecondPeriod);
+        
+        let adjustedTwoPeriodTotal = twoPeriodTotal;
+        if (totalFirstPeriod > totalSecondPeriod) {
+            adjustedTwoPeriodTotal += diffTwoPeriods;
+        } else {
+            adjustedTwoPeriodTotal -= diffTwoPeriods;
+        }
+
+        additionalTotal = Math.round((total + adjustedTwoPeriodTotal) / 2);
+    }
+
+    // Применяем коррекцию лиги
+    total = applyLeagueCorrection(total);
+    if (additionalTotal !== null) {
+        additionalTotal = applyLeagueCorrection(additionalTotal);
+    }
+
+    document.getElementById('totalValue').textContent = total;
+    document.getElementById('result').style.display = 'block';
+    
+    if (currentMode === 'three' && additionalTotal !== null) {
+        document.getElementById('additionalValue').textContent = additionalTotal;
+        document.getElementById('additionalResult').style.display = 'block';
+    } else {
+        document.getElementById('additionalResult').style.display = 'none';
+    }
+    
+    updateCurrentPredictions();
+}
+
+// Автоматический расчет
+document.querySelectorAll('.score-input').forEach(input => {
+    input.addEventListener('input', function() {
+        let allFilled = true;
+        const requiredFields = currentMode === 'two' 
+            ? ['team1-period1', 'team2-period1', 'team1-period2', 'team2-period2']
+            : ['team1-period1', 'team2-period1', 'team1-period2', 'team2-period2', 'team1-period3', 'team2-period3'];
+        
+        for (let fieldId of requiredFields) {
+            const field = document.getElementById(fieldId);
+            if (!field.value || field.value === '0') {
+                allFilled = false;
+                break;
+            }
+        }
+        
+        if (allFilled) {
+            calculateTotal();
+            if (currentTab === 'visualization') {
+                updateVisualization();
+            } else if (currentTab === 'magic') {
+                updateMagicSquare();
+            }
+        }
+        
+        updateCurrentPredictions();
+    });
+});
+
+// Автоматическая передача данных из калькулятора в Сидик Авган
+function updateSidikFromCalculator() {
+    const team1p1 = parseInt(document.getElementById('team1-period1').value) || 0;
+    const team2p1 = parseInt(document.getElementById('team2-period1').value) || 0;
+    const team1p2 = parseInt(document.getElementById('team1-period2').value) || 0;
+    const team2p2 = parseInt(document.getElementById('team2-period2').value) || 0;
+    const team1p3 = parseInt(document.getElementById('team1-period3').value) || 0;
+    const team2p3 = parseInt(document.getElementById('team2-period3').value) || 0;
+    
+    const totalPeriod1 = team1p1 + team2p1;
+    const totalPeriod2 = team1p2 + team2p2;
+    const totalPeriod3 = team1p3 + team2p3;
+    
+    document.getElementById('sidik-period1').value = totalPeriod1;
+    document.getElementById('sidik-period2').value = totalPeriod2;
+    
+    if (currentMode === 'three') {
+        document.getElementById('sidik-period3').value = totalPeriod3;
+    } else {
+        document.getElementById('sidik-period3').value = 0;
+    }
+    
+    autoCalculateSidik();
+    updateCurrentPredictions();
+}
+
+// Автоматический расчет Сидика Авгана
+function autoCalculateSidik() {
+    const period1 = parseInt(document.getElementById('sidik-period1').value) || 0;
+    const period2 = parseInt(document.getElementById('sidik-period2').value) || 0;
+    const period3 = parseInt(document.getElementById('sidik-period3').value) || 0;
+    
+    let enoughData = false;
+    if (currentMode === 'two') {
+        enoughData = period1 > 0 && period2 > 0;
+    } else {
+        enoughData = period1 > 0 && period2 > 0 && period3 > 0;
+    }
+    
+    if (enoughData) {
+        calculateSidikPredictions();
+    }
+}
+
+// Алгоритмы прогнозирования
+function exponentialSmoothing(data, alpha = 0.7) {
+    if (data.length < 2) return { prediction: 0, accuracy: 0 };
+    
+    let smoothed = data[0];
+    let mae = 0;
+    
+    for (let i = 1; i < data.length; i++) {
+        const error = Math.abs(data[i] - smoothed);
+        mae += error;
+        smoothed = alpha * data[i] + (1 - alpha) * smoothed;
+    }
+    
+    mae = mae / (data.length - 1);
+    const accuracy = Math.max(0, 100 - (mae / (Math.max(...data) || 1)) * 100);
+    
+    return { prediction: Math.round(smoothed), accuracy: Math.round(accuracy) };
+}
+
+function weightedRegression(data) {
+    if (data.length < 2) return { prediction: 0, interval: [0, 0], confidence: 0 };
+    
+    const n = data.length;
+    const weights = data.map((_, i) => Math.pow(1.5, i));
+    
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumW = 0;
+    
+    for (let i = 0; i < n; i++) {
+        const x = i + 1;
+        const y = data[i];
+        const w = weights[i];
+        
+        sumX += x * w;
+        sumY += y * w;
+        sumXY += x * y * w;
+        sumX2 += x * x * w;
+        sumW += w;
+    }
+    
+    const slope = (sumW * sumXY - sumX * sumY) / (sumW * sumX2 - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / sumW;
+    
+    const nextX = n + 1;
+    const prediction = slope * nextX + intercept;
+    
+    let variance = 0;
+    for (let i = 0; i < n; i++) {
+        const x = i + 1;
+        const y = data[i];
+        const predicted = slope * x + intercept;
+        variance += Math.pow(y - predicted, 2) * weights[i];
+    }
+    
+    const stdError = Math.sqrt(variance / (n - 2));
+    const margin = 1.96 * stdError * Math.sqrt(1 + 1/n);
+    
+    const confidence = Math.max(0, 100 - (stdError / (Math.max(...data) || 1)) * 150);
+    
+    return {
+        prediction: Math.round(prediction),
+        interval: [Math.round(prediction - margin), Math.round(prediction + margin)],
+        confidence: Math.round(confidence)
+    };
+}
+
+function adaptivePrediction(data) {
+    if (data.length < 2) return { prediction: 0, signal: "НЕТ ДАННЫХ", confidence: 0 };
+    
+    const trends = [];
+    for (let i = 1; i < data.length; i++) {
+        trends.push(data[i] - data[i-1]);
+    }
+    
+    const avgTrend = trends.reduce((a, b) => a + b, 0) / trends.length;
+    const volatility = Math.sqrt(trends.reduce((a, b) => a + Math.pow(b - avgTrend, 2), 0) / trends.length);
+    
+    let prediction;
+    let signal;
+    
+    if (volatility < 5) {
+        prediction = data.reduce((a, b) => a + b, 0) / data.length;
+        signal = "СТАБИЛЬНО";
+    } else if (Math.abs(avgTrend) > 8) {
+        prediction = data[data.length - 1] + avgTrend;
+        signal = avgTrend > 0 ? "📈 РОСТ" : "📉 ПАДЕНИЕ";
+    } else {
+        const weights = data.map((_, i) => i + 1);
+        const weightedSum = data.reduce((sum, val, i) => sum + val * weights[i], 0);
+        prediction = weightedSum / weights.reduce((a, b) => a + b, 0);
+        signal = "⏸️ ФЛЭТ";
+    }
+    
+    const confidence = Math.max(0, 100 - volatility * 3);
+    
+    return {
+        prediction: Math.round(prediction),
+        signal: signal,
+        confidence: Math.round(confidence)
+    };
+}
+
+function calculateRiskLevel(data) {
+    if (data.length < 2) return { level: "medium", text: "Недостаточно данных", icon: "⚠️" };
+    
+    const volatility = Math.sqrt(
+        data.slice(1).reduce((sum, val, i) => sum + Math.pow(val - data[i], 2), 0) / (data.length - 1)
+    );
+    
+    const avgValue = data.reduce((a, b) => a + b, 0) / data.length;
+    const cv = (volatility / avgValue) * 100;
+    
+    if (cv < 15) return { level: "low", text: "Низкий риск", icon: "✅" };
+    if (cv < 30) return { level: "medium", text: "Умеренный риск", icon: "⚠️" };
+    return { level: "high", text: "Высокий риск", icon: "🚨" };
+}
+
+// Магический квадрат Сидика Авгана
+function updateMagicSquare() {
+    const magicSquare = document.getElementById('magicSquare');
+    magicSquare.innerHTML = '';
+    
+    const team1p1 = parseInt(document.getElementById('team1-period1').value) || 0;
+    const team2p1 = parseInt(document.getElementById('team2-period1').value) || 0;
+    const team1p2 = parseInt(document.getElementById('team1-period2').value) || 0;
+    const team2p2 = parseInt(document.getElementById('team2-period2').value) || 0;
+    const team1p3 = parseInt(document.getElementById('team1-period3').value) || 0;
+    const team2p3 = parseInt(document.getElementById('team2-period3').value) || 0;
+    
+    const totalFirstPeriod = team1p1 + team2p1;
+    const totalSecondPeriod = team1p2 + team2p2;
+    const totalThirdPeriod = team1p3 + team2p3;
+    
+    const magicValues = createMagicSquare(totalFirstPeriod, totalSecondPeriod, totalThirdPeriod);
+    
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'magic-cell';
+        cell.innerHTML = `<span class="cell-index">${i+1}</span>${magicValues[i]}`;
+        
+        if (i === 0 || i === 2 || i === 6 || i === 8) {
+            cell.classList.add('corner');
+        }
+        if (i === 4) {
+            cell.classList.add('center');
+        }
+        
+        if (i === 0 || i === 4 || i === 8) {
+            cell.classList.add('diagonal');
+        }
+        if (i === 2 || i === 4 || i === 6) {
+            cell.classList.add('diagonal');
+        }
+        
+        if (magicValues[i] > 0) {
+            cell.classList.add('active');
+        }
+        
+        magicSquare.appendChild(cell);
+    }
+    
+    const calculations = calculateAllMagicValues(magicValues, totalFirstPeriod, totalSecondPeriod, totalThirdPeriod);
+    updateMagicUI(calculations, magicValues);
+    updateCurrentPredictions();
+}
+
+function createMagicSquare(p1, p2, p3) {
+    const baseSquare = [4, 9, 2, 3, 5, 7, 8, 1, 6];
+    
+    const adaptedSquare = baseSquare.map((value, index) => {
+        let multiplier;
+        
+        switch(index) {
+            case 0: multiplier = p1 / 15; break;
+            case 1: multiplier = p2 / 12; break;  
+            case 2: multiplier = p3 / 15; break;
+            case 3: multiplier = (p1 + p2) / 25; break;
+            case 4: multiplier = (p1 + p2 + p3) / 35; break;
+            case 5: multiplier = (p2 + p3) / 25; break;
+            case 6: multiplier = p3 / 15; break;
+            case 7: multiplier = p1 / 12; break;
+            case 8: multiplier = p2 / 15; break;
+            default: multiplier = 1;
+        }
+        
+        return Math.max(0, Math.round(value * multiplier));
+    });
+    
+    return adaptedSquare;
+}
+
+function calculateAllMagicValues(magicValues, p1, p2, p3) {
+    const row1 = magicValues[0] + magicValues[1] + magicValues[2];
+    const row2 = magicValues[3] + magicValues[4] + magicValues[5]; 
+    const row3 = magicValues[6] + magicValues[7] + magicValues[8];
+    
+    const mainDiagonal = magicValues[0] + magicValues[4] + magicValues[8];
+    const antiDiagonal = magicValues[2] + magicValues[4] + magicValues[6];
+    
+    const magicSumTotal = row1;
+    const diagonalBalance = mainDiagonal - antiDiagonal;
+    const diagonalEnergy = (mainDiagonal + antiDiagonal) / 2;
+    const centerPower = magicValues[4];
+    const activeCells = magicValues.filter(val => val > 0).length;
+    
+    const totalEnergy = magicValues.reduce((a, b) => a + b, 0);
+    const maxEnergy = 9 * 15;
+    const energyPercent = Math.min(100, Math.round((totalEnergy / maxEnergy) * 100));
+    
+    const prediction = calculateMagicPrediction(magicValues, p1, p2, p3, totalEnergy);
+    
+    return {
+        magicValues,
+        row1, row2, row3,
+        mainDiagonal, antiDiagonal,
+        magicSumTotal,
+        diagonalBalance,
+        diagonalEnergy,
+        centerPower,
+        activeCells,
+        totalEnergy,
+        energyPercent,
+        prediction
+    };
+}
+
+function calculateMagicPrediction(magicValues, p1, p2, p3, totalEnergy) {
+    const mainDiagonal = magicValues[0] + magicValues[4] + magicValues[8];
+    const antiDiagonal = magicValues[2] + magicValues[4] + magicValues[6];
+    
+    const magicEnergy = (mainDiagonal + antiDiagonal) / 2;
+    const periodTrend = p3 > p2 ? 1.1 : (p3 < p2 ? 0.9 : 1.0);
+    
+    let basePrediction;
+    if (currentMode === 'two') {
+        basePrediction = (p1 + p2) * 2;
+    } else {
+        basePrediction = (p1 + p2 + p3) * (4/3);
+    }
+    
+    const energyCorrection = 1 + (magicEnergy - 15) / 100;
+    const trendCorrection = periodTrend;
+    
+    const finalPrediction = basePrediction * energyCorrection * trendCorrection;
+    
+    // Применяем коррекцию лиги
+    finalPrediction = applyLeagueCorrection(finalPrediction);
+    
+    return {
+        final: Math.round(finalPrediction),
+        base: Math.round(basePrediction),
+        energyCorrection: Math.round((energyCorrection - 1) * 100),
+        trendCorrection: periodTrend.toFixed(1) + 'x'
+    };
+}
+
+function updateMagicUI(calculations, magicValues) {
+    document.getElementById('magicSumTotal').textContent = calculations.magicSumTotal;
+    document.getElementById('row1Sum').textContent = calculations.row1;
+    document.getElementById('row2Sum').textContent = calculations.row2;
+    document.getElementById('row3Sum').textContent = calculations.row3;
+    
+    document.getElementById('mainDiagonalSum').textContent = calculations.mainDiagonal;
+    document.getElementById('antiDiagonalSum').textContent = calculations.antiDiagonal;
+    document.getElementById('diagonalBalance').textContent = calculations.diagonalBalance;
+    document.getElementById('diagonalEnergy').textContent = Math.round(calculations.diagonalEnergy);
+    
+    document.getElementById('activeCells').textContent = `${calculations.activeCells}/9`;
+    document.getElementById('centerPower').textContent = calculations.centerPower;
+    
+    const energyLevel = calculations.energyPercent < 33 ? 'Низкий' : 
+                       calculations.energyPercent < 66 ? 'Средний' : 'Высокий';
+    document.getElementById('energyLevel').textContent = energyLevel;
+    
+    const energyFill = document.getElementById('energyFill');
+    energyFill.className = 'energy-fill ' + 
+        (calculations.energyPercent < 33 ? 'energy-low' : 
+         calculations.energyPercent < 66 ? 'energy-medium' : 'energy-high');
+    energyFill.style.width = calculations.energyPercent + '%';
+    
+    document.getElementById('magicPrediction').textContent = calculations.prediction.final;
+    document.getElementById('basePrediction').textContent = calculations.prediction.base;
+    document.getElementById('correctionValue').textContent = calculations.prediction.energyCorrection + '%';
+    document.getElementById('energyValue').textContent = calculations.energyPercent + '%';
+    document.getElementById('trendValue').textContent = calculations.prediction.trendCorrection;
+    document.getElementById('magicResult').style.display = 'block';
+    
+    updateMagicInterpretation(calculations);
+}
+
+function updateMagicInterpretation(calculations) {
+    let interpretation = "";
+    
+    if (calculations.energyPercent < 25) {
+        interpretation += "🌀 <strong>Низкая энергия</strong> - слабая взаимосвязь данных. ";
+    } else if (calculations.energyPercent < 50) {
+        interpretation += "💫 <strong>Умеренная энергия</strong> - стабильные показатели. ";
+    } else if (calculations.energyPercent < 75) {
+        interpretation += "⚡ <strong>Высокая энергия</strong> - сильная динамика. ";
+    } else {
+        interpretation += "🌪️ <strong>Мощная энергия</strong> - исключительная взаимосвязь! ";
+    }
+    
+    if (calculations.diagonalBalance > 10) {
+        interpretation += "Преобладает <strong>главная диагональ</strong> - устойчивый тренд. ";
+    } else if (calculations.diagonalBalance < -10) {
+        interpretation += "Доминирует <strong>побочная диагональ</strong> - высокая волатильность. ";
+    } else {
+        interpretation += "<strong>Баланс диагоналей</strong> - сбалансированная динамика. ";
+    }
+    
+    if (calculations.activeCells < 4) {
+        interpretation += "Мало активных элементов - консервативный прогноз. ";
+    } else if (calculations.activeCells < 7) {
+        interpretation += "Умеренная активность - стандартная динамика. ";
+    } else {
+        interpretation += "Высокая активность - экспрессивная игра! ";
+    }
+    
+    if (calculations.centerPower > 10) {
+        interpretation += "Сильный центр обеспечивает стабильность. ";
+    } else if (calculations.centerPower < 5) {
+        interpretation += "Слабый центр указывает на неопределенность. ";
+    }
+    
+    document.getElementById('magicInterpretation').innerHTML = interpretation;
+}
+
+// Визуализация и обновление данных
+function updateVisualization() {
+    const svg = document.querySelector('.triangle-svg');
+    svg.innerHTML = '';
+    
+    const team1p1 = parseInt(document.getElementById('team1-period1').value) || 0;
+    const team2p1 = parseInt(document.getElementById('team2-period1').value) || 0;
+    const team1p2 = parseInt(document.getElementById('team1-period2').value) || 0;
+    const team2p2 = parseInt(document.getElementById('team2-period2').value) || 0;
+    const team1p3 = parseInt(document.getElementById('team1-period3').value) || 0;
+    const team2p3 = parseInt(document.getElementById('team2-period3').value) || 0;
+    
+    const totalFirstPeriod = team1p1 + team2p1;
+    const totalSecondPeriod = team1p2 + team2p2;
+    const totalThirdPeriod = team1p3 + team2p3;
+    
+    const periodData = [totalFirstPeriod, totalSecondPeriod];
+    if (currentMode === 'three') periodData.push(totalThirdPeriod);
+    
+    let mainTotal, additionalTotal;
+    if (currentMode === 'two') {
+        mainTotal = (totalFirstPeriod + totalSecondPeriod) * 2;
+        if (totalFirstPeriod > totalSecondPeriod) {
+            mainTotal += (totalFirstPeriod - totalSecondPeriod);
+        } else {
+            mainTotal -= (totalSecondPeriod - totalFirstPeriod);
+        }
+        additionalTotal = null;
+    } else {
+        mainTotal = (totalFirstPeriod + totalSecondPeriod + totalThirdPeriod) * (4/3);
+        if (totalThirdPeriod > totalSecondPeriod) {
+            mainTotal += (totalThirdPeriod - totalSecondPeriod);
+        } else {
+            mainTotal -= (totalSecondPeriod - totalThirdPeriod);
+        }
+        mainTotal = Math.round(mainTotal);
+        
+        const twoPeriodTotal = (totalFirstPeriod + totalSecondPeriod) * 2;
+        const diffTwoPeriods = Math.abs(totalFirstPeriod - totalSecondPeriod);
+        let adjustedTwoPeriodTotal = twoPeriodTotal;
+        if (totalFirstPeriod > totalSecondPeriod) {
+            adjustedTwoPeriodTotal += diffTwoPeriods;
+        } else {
+            adjustedTwoPeriodTotal -= diffTwoPeriods;
+        }
+        additionalTotal = Math.round((mainTotal + adjustedTwoPeriodTotal) / 2);
+    }
+    
+    // Прогнозирование
+    const expSmooth = exponentialSmoothing(periodData);
+    const wReg = weightedRegression(periodData);
+    const adaptive = adaptivePrediction(periodData);
+    const risk = calculateRiskLevel(periodData);
+    
+    // Обновление UI
+    document.getElementById('expSmoothPrediction').textContent = expSmooth.prediction;
+    document.getElementById('expSmoothAccuracy').textContent = expSmooth.accuracy + '%';
+    document.getElementById('expSmoothConfidence').style.width = expSmooth.accuracy + '%';
+    
+    document.getElementById('weightedRegPrediction').textContent = wReg.prediction;
+    document.getElementById('weightedRegInterval').textContent = wReg.interval[0] + ' - ' + wReg.interval[1];
+    document.getElementById('weightedRegConfidence').style.width = wReg.confidence + '%';
+    
+    document.getElementById('adaptivePrediction').textContent = adaptive.prediction;
+    document.getElementById('adaptiveSignal').textContent = adaptive.signal;
+    document.getElementById('adaptiveConfidence').style.width = adaptive.confidence + '%';
+    
+    const riskIndicator = document.getElementById('riskIndicator');
+    riskIndicator.className = 'risk-indicator risk-' + risk.level;
+    document.getElementById('riskIcon').textContent = risk.icon;
+    document.getElementById('riskText').textContent = risk.text;
+    
+    // Визуализация треугольника
+    const points = [];
+    if (currentMode === 'two') {
+        points.push({x: 50, y: 250, value: totalFirstPeriod, label: 'Период 1'});
+        points.push({x: 150, y: 50, value: totalSecondPeriod, label: 'Период 2'});
+        points.push({x: 250, y: 250, value: mainTotal, label: 'Тотал'});
+    } else {
+        points.push({x: 50, y: 250, value: totalFirstPeriod, label: 'Период 1'});
+        points.push({x: 150, y: 50, value: totalSecondPeriod, label: 'Период 2'});
+        points.push({x: 250, y: 250, value: totalThirdPeriod, label: 'Период 3'});
+        if (additionalTotal !== null) {
+            points.push({x: 150, y: 150, value: additionalTotal, label: 'Доп. расчет'});
+        }
+    }
+    
+    if (points.length >= 3) {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        let pathData = `M ${points[0].x} ${points[0].y} `;
+        for (let i = 1; i < points.length; i++) {
+            pathData += `L ${points[i].x} ${points[i].y} `;
+        }
+        pathData += 'Z';
+        path.setAttribute('d', pathData);
+        path.setAttribute('fill', 'rgba(76, 201, 240, 0.2)');
+        path.setAttribute('stroke', 'var(--primary)');
+        path.setAttribute('stroke-width', '2');
+        svg.appendChild(path);
+    }
+    
+    points.forEach(point => {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', point.x);
+        circle.setAttribute('cy', point.y);
+        circle.setAttribute('r', '6');
+        circle.setAttribute('fill', 'var(--primary)');
+        circle.setAttribute('stroke', 'white');
+        circle.setAttribute('stroke-width', '2');
+        svg.appendChild(circle);
+        
+        const textValue = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textValue.setAttribute('x', point.x);
+        textValue.setAttribute('y', point.y - 12);
+        textValue.setAttribute('text-anchor', 'middle');
+        textValue.setAttribute('fill', 'white');
+        textValue.setAttribute('font-size', '10');
+        textValue.setAttribute('font-weight', 'bold');
+        textValue.textContent = point.value;
+        svg.appendChild(textValue);
+        
+        const textLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textLabel.setAttribute('x', point.x);
+        textLabel.setAttribute('y', point.y + 20);
+        textLabel.setAttribute('text-anchor', 'middle');
+        textLabel.setAttribute('fill', 'var(--secondary)');
+        textLabel.setAttribute('font-size', '8');
+        textLabel.textContent = point.label;
+        svg.appendChild(textLabel);
+    });
+    
+    let trendIcon, trendText, trendClass;
+    if (periodData.length >= 2) {
+        const lastTrend = periodData[periodData.length - 1] - periodData[periodData.length - 2];
+        if (lastTrend > 5) {
+            trendIcon = '↗️';
+            trendText = 'Сильный рост';
+            trendClass = 'trend-up';
+        } else if (lastTrend > 0) {
+            trendIcon = '↗️';
+            trendText = 'Умеренный рост';
+            trendClass = 'trend-up';
+        } else if (lastTrend < -5) {
+            trendIcon = '↘️';
+            trendText = 'Сильное падение';
+            trendClass = 'trend-down';
+        } else if (lastTrend < 0) {
+            trendIcon = '↘️';
+            trendText = 'Умеренное падение';
+            trendClass = 'trend-down';
+        } else {
+            trendIcon = '↔️';
+            trendText = 'Стабильность';
+            trendClass = 'trend-stable';
+        }
+    } else {
+        trendIcon = '↔️';
+        trendText = 'Недостаточно данных';
+        trendClass = 'trend-stable';
+    }
+    
+    document.getElementById('trendIcon').textContent = trendIcon;
+    document.getElementById('trendText').textContent = trendText;
+    const trendIndicator = document.getElementById('trendIndicator');
+    trendIndicator.classList.remove('trend-up', 'trend-down', 'trend-stable');
+    trendIndicator.classList.add(trendClass);
+}
+
+// Функции для вкладки Сидика Авгана
+function showSidikKeyboard(input) {
+    hideKeyboard();
+    
+    sidikCurrentInput = input;
+    const keyboard = document.getElementById('sidik-customKeyboard');
+    keyboard.style.display = 'grid';
+    
+    setTimeout(() => {
+        keyboard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+}
+
+function hideSidikKeyboard() {
+    document.getElementById('sidik-customKeyboard').style.display = 'none';
+    sidikCurrentInput = null;
+}
+
+function handleSidikKeyPress(value) {
+    if (!sidikCurrentInput) return;
+    
+    if (value === 'clear') {
+        sidikCurrentInput.value = '';
+    } else if (value === 'done') {
+        hideSidikKeyboard();
+        autoCalculateSidik();
+        updateCurrentPredictions();
+    } else {
+        const currentValue = sidikCurrentInput.value;
+        sidikCurrentInput.value = currentValue === '' ? value : currentValue + value;
+    }
+}
+
+function updateSidikCurrentDateTime() {
+    const now = new Date();
+    document.getElementById('sidik-customDate').valueAsDate = now;
+    document.getElementById('sidik-customTime').value = 
+        `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+}
+
+function calculateNumerologicalRoot(number) {
+    let num = Math.abs(number);
+    while (num > 9) {
+        num = num.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+    }
+    return num;
+}
+
+function findNearestWithRoot(target, targetRoot) {
+    let upper = target;
+    let lower = target;
+    
+    while (true) {
+        if (calculateNumerologicalRoot(upper) === targetRoot) {
+            return upper;
+        }
+        
+        if (lower > 0 && calculateNumerologicalRoot(lower) === targetRoot) {
+            return lower;
+        }
+        
+        upper++;
+        lower--;
+        
+        if (upper > target + 100) {
+            return target;
+        }
+    }
+}
+
+function getDateTimeFactors() {
+    let dateTime;
+    
+    if (document.getElementById('sidik-useCurrentTime').checked) {
+        dateTime = new Date();
+    } else {
+        const dateStr = document.getElementById('sidik-customDate').value;
+        const timeStr = document.getElementById('sidik-customTime').value;
+        const timezone = parseInt(document.getElementById('sidik-timezone').value);
+        
+        if (!dateStr || !timeStr) {
+            dateTime = new Date();
+        } else {
+            dateTime = new Date(`${dateStr}T${timeStr}:00Z`);
+            dateTime.setHours(dateTime.getHours() - timezone);
+        }
+    }
+    
+    const year = dateTime.getFullYear();
+    const month = dateTime.getMonth() + 1;
+    const day = dateTime.getDate();
+    const hour = dateTime.getHours();
+    const minute = dateTime.getMinutes();
+    const dayOfWeek = dateTime.getDay() === 0 ? 7 : dateTime.getDay();
+    
+    const dateFactor = calculateNumerologicalRoot(day + month + year);
+    const timeFactor = calculateNumerologicalRoot(hour + minute);
+    const dayOfWeekFactor = dayOfWeek;
+    const combinedFactor = calculateNumerologicalRoot(dateFactor + timeFactor + dayOfWeekFactor);
+    
+    return {
+        dateTime,
+        dateFactor,
+        timeFactor,
+        dayOfWeekFactor,
+        combinedFactor,
+        components: { year, month, day, hour, minute, dayOfWeek }
+    };
+}
+
+function calculateFourthPeriod(period1, period2, period3, root1, root2, root3, datetimeFactors) {
+    const mean = Math.round((period1 + period2 + period3) / 3);
+    
+    const sumRoots = root1 + root2 + root3;
+    const adjustedSum = sumRoots + datetimeFactors.combinedFactor;
+    
+    let root4;
+    if (adjustedSum % 9 === 0) {
+        root4 = 9;
+    } else {
+        root4 = adjustedSum % 9;
+    }
+    
+    return findNearestWithRoot(mean, root4);
+}
+
+function updateDateTimeAnalysis(datetimeFactors) {
+    const analysisElement = document.getElementById('sidik-datetimeAnalysis');
+    const { dateFactor, timeFactor, dayOfWeekFactor, combinedFactor, components } = datetimeFactors;
+    
+    const dayNames = ['', 'понедельник', 'вторник', 'среду', 'четверг', 'пятницу', 'субботу', 'воскресенье'];
+    const monthNames = [
+        '', 'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+    ];
+    
+    let analysis = `Расчет выполнен для ${components.day} ${monthNames[components.month]} ${components.year} года, `;
+    analysis += `${components.hour.toString().padStart(2, '0')}:${components.minute.toString().padStart(2, '0')} (${dayNames[components.dayOfWeek]}). `;
+    analysis += `Факторы: дата=${dateFactor}, время=${timeFactor}, день недели=${dayOfWeekFactor}. `;
+    analysis += `Комбинированный фактор: ${combinedFactor}.`;
+    
+    analysisElement.textContent = analysis;
+}
+
+function generateSidikMagicSquare(root1, root2, root3, root4, datetimeFactors) {
+    const magicSquare = document.getElementById('sidik-magicSquare');
+    magicSquare.innerHTML = '';
+    
+    const baseSquare = [
+        16, 3, 2, 13,
+        5, 10, 11, 8,
+        9, 6, 7, 12,
+        4, 15, 14, 1
+    ];
+    
+    for (let i = 0; i < 16; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'sidik-square-cell';
+        
+        let value = baseSquare[i];
+        
+        if (i === 0) value += root1 - 1;
+        if (i === 3) value += root2 - 1;
+        if (i === 12) value += root3 - 1;
+        if (i === 15) value += root4 - 1;
+        
+        if (i === 5 || i === 6 || i === 9 || i === 10) {
+            value += datetimeFactors.combinedFactor;
+        }
+        
+        value = ((value - 1) % 16) + 1;
+        
+        cell.textContent = value;
+        
+        if (i === 0 || i === 3 || i === 12 || i === 15) {
+            cell.classList.add('highlight');
+        }
+        
+        magicSquare.appendChild(cell);
+    }
+}
+
+function findNumbersWithRoot(targetRoot, nearValue, count = 5) {
+    const numbers = [];
+    let current = nearValue;
+    
+    for (let offset = 0; numbers.length < count && offset < 50; offset++) {
+        const upper = nearValue + offset;
+        const lower = nearValue - offset;
+        
+        if (lower > 0 && calculateNumerologicalRoot(lower) === targetRoot && !numbers.includes(lower)) {
+            numbers.push(lower);
+        }
+        
+        if (calculateNumerologicalRoot(upper) === targetRoot && !numbers.includes(upper)) {
+            numbers.push(upper);
+        }
+    }
+    
+    return numbers.sort((a, b) => a - b).slice(0, count);
+}
+
+function getRootMeaning(root) {
+    const meanings = {
+        1: "Начало, лидерство, уверенность",
+        2: "Баланс, партнерство, гармония", 
+        3: "Творчество, рост, экспрессия",
+        4: "Стабильность, порядок, надежность",
+        5: "Изменения, свобода, адаптивность",
+        6: "Ответственность, забота, семья",
+        7: "Анализ, мудрость, интуиция", 
+        8: "Изобилие, успех, материальные блага",
+        9: "Завершение, мудрость, трансформация"
+    };
+    
+    return meanings[root] || "Нейтральная энергия";
+}
+
+function generateSidikAnalysis(root1, root2, root3, root4, totalRoot, datetimeFactors) {
+    const analysisText = document.getElementById('sidik-analysisText');
+    
+    let analysis = '';
+    
+    analysis += `<p><strong>Анализ периодов:</strong> П1(корень ${root1}) → ${getRootMeaning(root1)}, `;
+    analysis += `П2(корень ${root2}) → ${getRootMeaning(root2)}, `;
+    analysis += `П3(корень ${root3}) → ${getRootMeaning(root3)}</p>`;
+    
+    analysis += `<p><strong>4-й период (корень ${root4}):</strong> ${getRootMeaning(root4)}</p>`;
+    
+    analysis += `<p><strong>Общий тотал (корень ${totalRoot}):</strong> ${getRootMeaning(totalRoot)}</p>`;
+    
+    if (totalRoot === 7 || root4 === 7) {
+        analysis += `<p>✨ <strong>Особый знак:</strong> Число 7 - символ удачи и интуиции</p>`;
+    }
+    
+    if ([root1, root2, root3, root4].filter(root => root === 8).length >= 2) {
+        analysis += `<p>💰 <strong>Благоприятный знак:</strong> Несколько периодов с корнем 8 - потенциал изобилия</p>`;
+    }
+    
+    if (totalRoot === root4) {
+        analysis += `<p>🔄 <strong>Синхронность:</strong> Корень тотала совпадает с корнем 4-го периода</p>`;
+    }
+    
+    analysisText.innerHTML = analysis;
+}
+
+function calculateSidikPredictions() {
+    const period1 = parseInt(document.getElementById('sidik-period1').value) || 0;
+    const period2 = parseInt(document.getElementById('sidik-period2').value) || 0;
+    const period3 = parseInt(document.getElementById('sidik-period3').value) || 0;
+    
+    if (period1 <= 0 || period2 <= 0 || period3 <= 0) {
+        alert('Пожалуйста, заполните все три периода корректными положительными числами');
+        return;
+    }
+    
+    document.getElementById('sidik-loader').style.display = 'block';
+    document.getElementById('sidik-results').style.display = 'none';
+    
+    setTimeout(() => {
+        try {
+            const datetimeFactors = getDateTimeFactors();
+            
+            const root1 = calculateNumerologicalRoot(period1);
+            const root2 = calculateNumerologicalRoot(period2);
+            const root3 = calculateNumerologicalRoot(period3);
+            
+            const period4 = calculateFourthPeriod(period1, period2, period3, root1, root2, root3, datetimeFactors);
+            const root4 = calculateNumerologicalRoot(period4);
+            
+            const total = period1 + period2 + period3 + period4;
+            const totalRoot = calculateNumerologicalRoot(total);
+            
+            document.getElementById('sidik-period4Result').textContent = period4;
+            document.getElementById('sidik-period4Root').textContent = root4;
+            document.getElementById('sidik-totalResult').textContent = total;
+            document.getElementById('sidik-totalRoot').textContent = totalRoot;
+            document.getElementById('sidik-datetimeFactor').textContent = datetimeFactors.combinedFactor;
+            document.getElementById('sidik-datetimeUsed').textContent = 
+                datetimeFactors.dateTime.toLocaleDateString('ru-RU') + ' ' + 
+                datetimeFactors.dateTime.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'});
+            
+            updateDateTimeAnalysis(datetimeFactors);
+            generateSidikMagicSquare(root1, root2, root3, root4, datetimeFactors);
+            
+            document.getElementById('sidik-recPeriodRoot').textContent = root4;
+            document.getElementById('sidik-recTotalRoot').textContent = totalRoot;
+            
+            const periodRecs = document.getElementById('sidik-periodRecommendations');
+            periodRecs.innerHTML = '';
+            
+            const periodNumbers = findNumbersWithRoot(root4, period4, 8);
+            periodNumbers.forEach(num => {
+                const item = document.createElement('div');
+                item.className = 'sidik-recommendation-item';
+                item.textContent = num;
+                periodRecs.appendChild(item);
+            });
+            
+            const totalRecs = document.getElementById('sidik-totalRecommendations');
+            totalRecs.innerHTML = '';
+            
+            const totalNumbers = findNumbersWithRoot(totalRoot, total, 8);
+            totalNumbers.forEach(num => {
+                const item = document.createElement('div');
+                item.className = 'sidik-recommendation-item';
+                item.textContent = num;
+                totalRecs.appendChild(item);
+            });
+            
+            generateSidikAnalysis(root1, root2, root3, root4, totalRoot, datetimeFactors);
+            
+        } catch (error) {
+            console.error('Ошибка расчета:', error);
+            alert('Произошла ошибка при расчете. Проверьте введенные данные.');
+        } finally {
+            document.getElementById('sidik-loader').style.display = 'none';
+            document.getElementById('sidik-results').style.display = 'block';
+            updateCurrentPredictions();
+        }
+    }, 1000);
+}
+
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('selectedTheme') || 'sun';
+    setTheme(savedTheme);
+    document.querySelector(`[onclick="setTheme('${savedTheme}')"]`).classList.add('active');
+    
+    updateMagicSquare();
+    updateSidikCurrentDateTime();
+    
+    document.getElementById('sidik-useCurrentTime').addEventListener('change', function() {
+        document.getElementById('sidik-datetimeControls').style.display = this.checked ? 'none' : 'flex';
+        if (this.checked) {
+            updateSidikCurrentDateTime();
+        }
+    });
+    
+    const sidikKeyboard = document.getElementById('sidik-customKeyboard');
+    const keyboardKeys = sidikKeyboard.querySelectorAll('.sidik-keyboard-key');
+    
+    keyboardKeys.forEach(key => {
+        key.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            if (value) {
+                handleSidikKeyPress(value);
+            } else if (this.classList.contains('clear')) {
+                handleSidikKeyPress('clear');
+            } else if (this.classList.contains('done')) {
+                handleSidikKeyPress('done');
+            }
+        });
+    });
+    
+    document.addEventListener('click', function(e) {
+        const keyboard = document.getElementById('sidik-customKeyboard');
+        const inputs = document.querySelectorAll('#sidik-period1, #sidik-period2, #sidik-period3');
+        
+        if (keyboard.style.display === 'grid' && 
+            !keyboard.contains(e.target) && 
+            !Array.from(inputs).some(input => input.contains(e.target))) {
+            hideSidikKeyboard();
+        }
+    });
+    
+    document.getElementById('sidik-calculateBtn').addEventListener('click', calculateSidikPredictions);
+    
+    const sidikInputs = document.querySelectorAll('#sidik-period1, #sidik-period2, #sidik-period3');
+    sidikInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            autoCalculateSidik();
+            updateCurrentPredictions();
+        });
+    });
+    
+    updateSidikFromCalculator();
+    initLearningSystem();
+    initLeaguesSystem();
+});
+</script>
+</body>
+</html>
